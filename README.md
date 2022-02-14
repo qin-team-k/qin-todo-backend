@@ -1,6 +1,6 @@
-# Qin Todo Backend by Team k
+# Qin Todo Backend by Team-k
 
-Qin Todo Team K のバックエンドレポジトリ
+Qin Todo のバックエンドレポジトリ by Team-k
 
 ## 使用技術
 
@@ -28,7 +28,7 @@ Qin Todo Team K のバックエンドレポジトリ
 # .envの作成
 echo 'DATABASE_URL="mysql://root:password@localhost:3306/qin-todo"' > .env
 
-# 依存パッケージのインストール & Prismaモデル最新化
+# 依存パッケージのインストール & prisma.schemaの情報を反映
 yarn pre:all
 
 # api/dbの起動
@@ -82,15 +82,16 @@ feature/[対応する issue 番号]-[作業の概要]
 ├── package.json
 ├── src
 │   ├── app.module.ts
-│   ├── todo
-│   │   ├── todo.controller.spec.ts
-│   │   ├── todo.controller.ts
-│   │   ├── todo.module.ts
-│   │   ├── todo.service.ts
-│   │   ├── dto
-│   │   │   └── create-todo.dto.ts
-│   │   └── interfaces
-│   │       └── todo.interface.ts
+│   ├── api
+│   │   ├── todo
+│   │   │   ├── todo.controller.spec.ts
+│   │   │   ├── todo.controller.ts
+│   │   │   ├── todo.module.ts
+│   │   │   ├── todo.service.ts
+│   │   │   ├── dto
+│   │   │   │   └── create-todo.dto.ts
+│   │   │   └── interfaces
+│   │   │       └── todo.interface.ts
 │   ├── common
 │   │   ├── decorators
 │   │   │   └── roles.decorator.ts
