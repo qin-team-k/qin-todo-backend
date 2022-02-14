@@ -91,7 +91,7 @@ feature/[対応する issue 番号]-[作業の概要]
 │   │   │   ├── dto
 │   │   │   │   └── create-todo.dto.ts
 │   │   │   └── interfaces
-│   │   │       └── todo.interface.ts
+│   │           └── todo.interface.ts
 │   ├── common
 │   │   ├── decorators
 │   │   │   └── roles.decorator.ts
