@@ -40,7 +40,7 @@ yarn migrate
 # 開発環境の起動
 yarn run start:dev
 
-# api/dbの終了
+# api/dbの終了(終了時に実行)
 yarn run docker:down
 ```
 
