@@ -36,6 +36,12 @@ yarn run docker:up
 
 # 開発環境の起動
 yarn run start:dev
+
+# セットアップ確認
+curl --location --request GET 'http://localhost:3000/healthcheck'
+
+# api/dbの終了
+yarn run docker:down
 ```
 
 ## テスト実行
@@ -83,14 +89,14 @@ feature/[対応する issue 番号]-[作業の概要]
 ├── src
 │   ├── app.module.ts
 │   ├── api
-│   │   ├── todo
-│   │   │   ├── todo.controller.spec.ts
-│   │   │   ├── todo.controller.ts
-│   │   │   ├── todo.module.ts
-│   │   │   ├── todo.service.ts
-│   │   │   ├── dto
-│   │   │   │   └── create-todo.dto.ts
-│   │   │   └── interfaces
+│   │   └──todo
+│   │       ├── todo.controller.spec.ts
+│   │       ├── todo.controller.ts
+│   │       ├── todo.module.ts
+│   │       ├── todo.service.ts
+│   │       ├── dto
+│   │       │   └── create-todo.dto.ts
+│   │       └── interfaces
 │   │           └── todo.interface.ts
 │   ├── common
 │   │   ├── decorators
