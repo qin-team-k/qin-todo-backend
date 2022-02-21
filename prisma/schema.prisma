@@ -7,25 +7,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Todo {
-  id        String   @id
-  userId    String   @map("user_id")
-  content   String   @db.VarChar(255)
-  status    String   @db.VarChar(255)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-
-  @@map("todos")
-}
-
 model User {
-  id        String   @id
-  uid       String   @unique
-  userName  String   @unique @map("user_name") @db.VarChar(255)
+  id        String   @id @default(uuid())
+  username  String   @unique @map("user_name") @db.VarChar(255)
   email     String   @unique @db.VarChar(255)
   avatarUrl String   @map("avatar_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  todos     Todo[]
 
   @@map("users")
+}
+
+model Todo {
+  id          Int       @id @default(autoincrement())
+  content     String    @db.VarChar(255)
+  todoOrderId Int       @map("todo_order_id")
+  todoOrder   TodoOrder @relation(fields: [todoOrderId], references: [id])
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("todos")
+}
+
+model TodoOrder {
+  id      Int    @id @default(autoincrement())
+  status  String @db.VarChar(20)
+  todoIds String @db.VarChar(1000)
+  Todo    Todo[]
 }
