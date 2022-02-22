@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  username  String   @map("user_name") @db.VarChar(255)
-  email     String   @unique @db.VarChar(255)
-  avatarUrl String   @map("avatar_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
-  todos     Todo[]
+  id         String      @id @default(uuid())
+  username   String      @map("user_name") @db.VarChar(255)
+  email      String      @unique @db.VarChar(255)
+  avatarUrl  String      @map("avatar_url")
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
+  todos      Todo[]
+  todoStatus TodoOrder[]
 
   @@map("user")
 }
@@ -29,7 +30,6 @@ model Todo {
   User      User     @relation(fields: [userId], references: [id])
   userId    String
 
-
   @@map("todo")
 }
 
@@ -37,6 +37,8 @@ model TodoOrder {
   id      Int        @id @default(autoincrement())
   status  TodoStatus
   todoIds String     @db.VarChar(1000)
+  User    User       @relation(fields: [userId], references: [id])
+  userId  String
 }
 
 enum TodoStatus {
