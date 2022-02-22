@@ -16,7 +16,7 @@ model User {
   updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
   todos     Todo[]
 
-  @@map("users")
+  @@map("user")
 }
 
 model Todo {
@@ -29,7 +29,7 @@ model Todo {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @default(now()) @updatedAt @map("updated_at")
 
-  @@map("todos")
+  @@map("todo")
 }
 
 model TodoOrder {
