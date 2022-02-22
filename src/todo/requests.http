@@ -15,7 +15,7 @@ Content-Type:  application/json
 POST http://localhost:3000/todos/5678/duplicate
 
 ### 完了・未完了の切り替え
-PUT http://localhost:3000/todos/toggle
+PUT http://localhost:3000/todos/2/toggle
 
 ### Todo並び替え
 PUT http://localhost:3000/todos/order
@@ -24,4 +24,4 @@ PUT http://localhost:3000/todos/order
 PUT http://localhost:3000/todos/12345
 
 ### Todo削除
-DELETE  http://localhost:3000/todos/12345
+DELETE  http://localhost:3000/todos/1
