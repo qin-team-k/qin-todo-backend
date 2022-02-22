@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import {
   Body,
   Controller,
@@ -8,7 +9,6 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
-import { CreateTodoDto } from './dto/todo.dto';
 import { TodoService } from './todo.service';
 
 @Controller('todos')
@@ -21,7 +21,7 @@ export class TodoController {
   }
 
   @Post()
-  create(@Body() body: CreateTodoDto) {
+  create(@Body() body: Prisma.TodoCreateInput) {
     return this.todoService.create(body);
   }
 
@@ -30,9 +30,9 @@ export class TodoController {
     return this.todoService.duplicate(todoId);
   }
 
-  @Put('toggle')
-  toggleDone() {
-    return this.todoService.toggleDone();
+  @Put(':todoId/toggle')
+  toggleDone(@Param('todoId', ParseIntPipe) todoId: number) {
+    return this.todoService.toggleDone(todoId);
   }
 
   @Put('order')
@@ -46,7 +46,7 @@ export class TodoController {
   }
 
   @Delete(':todoId')
-  remove(@Param('todoId', ParseIntPipe) todoId: number) {
-    return this.todoService.remove(todoId);
+  delete(@Param('todoId', ParseIntPipe) todoId: number) {
+    return this.todoService.delete(todoId);
   }
 }
