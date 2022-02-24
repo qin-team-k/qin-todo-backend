@@ -7,21 +7,25 @@ POST http://localhost:3000/todos
 Content-Type:  application/json
 
 {
-  "content": "筋トレ",
-  "status": "TODAY"
+  "content": "ゴミ捨て"
 }
 
 ### Todo複製
 POST http://localhost:3000/todos/5678/duplicate
 
 ### 完了・未完了の切り替え
-PUT http://localhost:3000/todos/2/toggle
+PUT http://localhost:3000/todos/5/toggle
 
 ### Todo並び替え
-PUT http://localhost:3000/todos/order
+PUT http://localhost:3000/todos/6/order/
 
 ### Todo内容更新
-PUT http://localhost:3000/todos/12345
+PUT http://localhost:3000/todos/7
+Content-Type:  application/json
+
+{
+  "content": "猫の餌やり"
+}
 
 ### Todo削除
-DELETE  http://localhost:3000/todos/1
+DELETE  http://localhost:3000/todos/6/c8c6b6a9-1c87-46b9-b9ef-80c4288936da
