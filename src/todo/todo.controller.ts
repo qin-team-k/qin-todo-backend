@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, TodoStatus } from '@prisma/client';
 import {
   Body,
   Controller,
@@ -40,9 +40,13 @@ export class TodoController {
   }
 
   // Todo並び替え
-  @Put(':todoId/order')
-  updateOrder(@Param('todoId', ParseIntPipe) todoId: number) {
-    return this.todoService.updateOrder(todoId);
+  @Put(':todoId/:status/:index/order')
+  updateOrder(
+    @Param('todoId', ParseIntPipe) todoId: number,
+    @Param('status') status: TodoStatus,
+    @Param('index', ParseIntPipe) index: number,
+  ) {
+    return this.todoService.updateOrder(todoId, status, index);
   }
 
   // Todo内容更新
@@ -55,7 +59,7 @@ export class TodoController {
   }
 
   // Todo削除
-  @Delete(':todoId/:userId')
+  @Delete(':todoId')
   delete(@Param('todoId', ParseIntPipe) todoId: number) {
     return this.todoService.delete(todoId);
   }
