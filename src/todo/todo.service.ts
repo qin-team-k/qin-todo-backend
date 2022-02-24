@@ -8,10 +8,12 @@ import { CreateTodoDto } from './dto/todo.dto';
 export class TodoService {
   constructor(private prisma: PrismaService) {}
 
+  // Todo一覧取得
   findAll() {
     return this.prisma.todo.findMany();
   }
 
+  // Todo作成
   async create(payload: Prisma.TodoCreateInput) {
     const todo = await this.prisma.todo.create({
       data: {
@@ -54,10 +56,12 @@ export class TodoService {
     }
   }
 
+  // Todo複製
   duplicate(todoId: number) {
     return `todo duplicated with ${todoId}`;
   }
 
+  // 完了・未完了の切り替え
   async toggleDone(todoId: number) {
     const todo = await this.prisma.todo.findUnique({
       where: {
@@ -74,6 +78,7 @@ export class TodoService {
     });
   }
 
+  // Todo並び替え
   async updateOrder(todoId: number) {
     const todo = await this.prisma.todo.findUnique({
       where: { id: todoId },
@@ -81,6 +86,7 @@ export class TodoService {
     return todo;
   }
 
+  // Todo内容更新
   updateContent(todoId: number, payload: Prisma.TodoCreateInput) {
     return this.prisma.todo.update({
       where: { id: todoId },
@@ -90,6 +96,7 @@ export class TodoService {
     });
   }
 
+  // Todo削除
   async delete(todoId: number) {
     const deletedTodo = await this.prisma.todo.delete({
       where: {
