@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `todo` MODIFY `status` ENUM('TODAY', 'TOMORROW', 'NEXT') NOT NULL DEFAULT 'TODAY';

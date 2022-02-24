@@ -1,2 +1,2 @@
-export const USER_1 = '016897ec-3e41-4373-bef3-eb9b1b56af99';
-export const USER_2 = 'c8c6b6a9-1c87-46b9-b9ef-80c4288936da';
+export const USER_1 = '671b96c4-e68a-416f-b712-9bd9bf978ccb';
+export const USER_2 = 'e76db267-066e-4e33-869c-508e41bb1a7d';
