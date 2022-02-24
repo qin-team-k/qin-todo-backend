@@ -1,9 +1,9 @@
 ### Todo一覧取得
-GET http://localhost:3000/todos
+GET http://localhost:3000/v1/todos
 
 
 ### Todo作成
-POST http://localhost:3000/todos
+POST http://localhost:3000/v1/todos
 Content-Type:  application/json
 
 {
@@ -11,16 +11,16 @@ Content-Type:  application/json
 }
 
 ### Todo複製
-POST http://localhost:3000/todos/8/duplicate
+POST http://localhost:3000/v1/todos/8/duplicate
 
 ### 完了・未完了の切り替え
-PUT http://localhost:3000/todos/5/toggle
+PUT http://localhost:3000/v1/todos/5/toggle
 
 ### Todo並び替え
-PUT http://localhost:3000/todos/17/NEXT/1/order
+PUT http://localhost:3000/v1/todos/17/NEXT/1/order
 
 ### Todo内容更新
-PUT http://localhost:3000/todos/7
+PUT http://localhost:3000/v1/todos/7
 Content-Type:  application/json
 
 {
@@ -28,4 +28,4 @@ Content-Type:  application/json
 }
 
 ### Todo削除
-DELETE  http://localhost:3000/todos/4
+DELETE  http://localhost:3000/v1/todos/4
