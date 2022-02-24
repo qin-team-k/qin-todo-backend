@@ -11,9 +11,16 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+
   app.enableVersioning({
     type: VersioningType.URI,
   });
+
+  app.enableCors({
+    origin: '*',
+    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+  });
+
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port, '0.0.0.0');
 }
