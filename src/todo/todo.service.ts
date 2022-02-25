@@ -9,8 +9,43 @@ export class TodoService {
   constructor(private prisma: PrismaService) {}
 
   // Todo一覧取得
-  findAll() {
-    return this.prisma.todo.findMany();
+  async findAll() {
+    const todoOrders = await this.prisma.todoOrder.findMany({
+      where: {
+        userId: USER_2,
+      },
+    });
+    const todayTodoOrder = todoOrders.filter(
+      (todoOrder) => todoOrder.status === 'TODAY',
+    );
+    const tomorrowTodoOrder = todoOrders.filter(
+      (todoOrder) => todoOrder.status === 'TOMORROW',
+    );
+    const nextTodoOrder = todoOrders.filter(
+      (todoOrder) => todoOrder.status === 'NEXT',
+    );
+
+    const todayTodoIds = todayTodoOrder[0].todoIds.split(',');
+    const tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
+    const nextTodoIds = nextTodoOrder[0].todoIds.split(',');
+
+    const todos = await this.prisma.todo.findMany();
+
+    const TOMORROW = tomorrowTodoIds.map((id) =>
+      todos.find((todo) => todo.id === Number(id)),
+    );
+    const NEXT = nextTodoIds.map((id) =>
+      todos.find((todo) => todo.id === Number(id)),
+    );
+    const TODAY = todayTodoIds.map((id) =>
+      todos.find((todo) => todo.id === Number(id)),
+    );
+
+    return {
+      TODAY: TODAY.filter(Boolean),
+      TOMORROW,
+      NEXT,
+    };
   }
 
   // Todo作成
@@ -18,6 +53,7 @@ export class TodoService {
     const todo = await this.prisma.todo.create({
       data: {
         content: payload.content,
+        status: payload.status,
         userId: USER_2,
       },
     });
@@ -25,7 +61,7 @@ export class TodoService {
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
         userId: todo.userId,
-        status: TodoStatus.TODAY,
+        status: payload.status,
       },
     });
 
@@ -33,7 +69,7 @@ export class TodoService {
       await this.prisma.todoOrder.updateMany({
         where: {
           userId: todo.userId,
-          status: TodoStatus.TODAY,
+          status: payload.status,
         },
         data: {
           todoIds: `${todo.id}`,
@@ -46,7 +82,7 @@ export class TodoService {
       await this.prisma.todoOrder.updateMany({
         where: {
           userId: todo.userId,
-          status: TodoStatus.TODAY,
+          status: payload.status,
         },
         data: {
           todoIds: currentTodoIds.join(','),
@@ -109,7 +145,11 @@ export class TodoService {
   }
 
   // Todo並び替え
-  async updateOrder(todoId: number, status: TodoStatus, index: number) {
+  async updateOrder(
+    todoId: number,
+    payload: Prisma.TodoCreateInput,
+    index: number,
+  ) {
     // まず対象のTodoを削除
     const deletedTodo = await this.prisma.todo.delete({
       where: {
@@ -144,7 +184,8 @@ export class TodoService {
       data: {
         content: deletedTodo.content,
         userId: USER_2,
-        status,
+        status: payload.status,
+        done: payload.done,
       },
     });
 
@@ -161,7 +202,7 @@ export class TodoService {
       await this.prisma.todoOrder.updateMany({
         where: {
           userId: movedTodo.userId,
-          status,
+          status: payload.status,
         },
         data: {
           todoIds: newTodoOrders[0].todoIds,
@@ -175,7 +216,7 @@ export class TodoService {
       await this.prisma.todoOrder.updateMany({
         where: {
           userId: movedTodo.userId,
-          status,
+          status: payload.status,
         },
         data: {
           todoIds: currentNewTodoIds.join(','),
