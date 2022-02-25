@@ -46,13 +46,13 @@ export class TodoController {
 
   // Todo並び替え
   @Version('1')
-  @Put(':todoId/:status/:index/order')
+  @Put(':todoId/:index/order')
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @Param('status') status: TodoStatus,
+    @Body() body: Prisma.TodoCreateInput,
     @Param('index', ParseIntPipe) index: number,
   ) {
-    return this.todoService.updateOrder(todoId, status, index);
+    return this.todoService.updateOrder(todoId, body, index);
   }
 
   // Todo内容更新
