@@ -1,8 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, TodoStatus } from '@prisma/client';
-import { USER_1, USER_2 } from 'src/constant';
+import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { USER_2 } from 'src/constant';
 import { PrismaService } from 'src/prisma.service';
-import { CreateTodoDto } from './dto/todo.dto';
 
 @Injectable()
 export class TodoService {

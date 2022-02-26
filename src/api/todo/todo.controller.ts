@@ -1,4 +1,4 @@
-import { Prisma, TodoStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import {
   Body,
   Controller,
