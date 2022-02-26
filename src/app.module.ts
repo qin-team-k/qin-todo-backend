@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { TodoModule } from './api/todo/todo.module';
+import { UserModule } from './api/user/user.module';
 import { healthCheckController } from './healthCheck.controller';
-import { TodoModule } from './todo/todo.module';
-import { UserModule } from './user/user.module';
 
 @Module({
   imports: [TodoModule, UserModule],
