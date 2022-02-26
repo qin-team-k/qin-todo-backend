@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { USER_2 } from 'src/constant';
 import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
@@ -8,10 +7,10 @@ export class TodoService {
   constructor(private prisma: PrismaService) {}
 
   // Todo一覧取得
-  async findAll() {
+  async findAll(userId) {
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
-        userId: USER_2,
+        userId,
       },
     });
     const todayTodoOrder = todoOrders.filter(
@@ -48,12 +47,12 @@ export class TodoService {
   }
 
   // Todo作成
-  async create(payload: Prisma.TodoCreateInput) {
+  async create(userId: string, payload: Prisma.TodoCreateInput) {
     const todo = await this.prisma.todo.create({
       data: {
         content: payload.content,
+        userId,
         status: payload.status,
-        userId: USER_2,
       },
     });
 
@@ -92,14 +91,14 @@ export class TodoService {
   }
 
   // Todo複製
-  async duplicate(todoId: number) {
+  async duplicate(userId: string, todoId: number) {
     const todo = await this.prisma.todo.findUnique({
       where: { id: todoId },
     });
     const duplicatedTodo = await this.prisma.todo.create({
       data: {
         content: todo.content,
-        userId: USER_2,
+        userId,
         status: todo.status,
       },
     });
@@ -145,6 +144,7 @@ export class TodoService {
 
   // Todo並び替え
   async updateOrder(
+    userId: string,
     todoId: number,
     payload: Prisma.TodoCreateInput,
     index: number,
@@ -159,7 +159,7 @@ export class TodoService {
     // todoOrderテーブルからも削除
     const currentTodoOrders = await this.prisma.todoOrder.findMany({
       where: {
-        userId: USER_2,
+        userId: userId,
         status: deletedTodo.status,
       },
     });
@@ -182,7 +182,7 @@ export class TodoService {
     const movedTodo = await this.prisma.todo.create({
       data: {
         content: deletedTodo.content,
-        userId: USER_2,
+        userId: userId,
         status: payload.status,
         done: payload.done,
       },
@@ -191,7 +191,7 @@ export class TodoService {
     // todoOrderテーブルへ追加
     const newTodoOrders = await this.prisma.todoOrder.findMany({
       where: {
-        userId: USER_2,
+        userId: userId,
         status: movedTodo.status,
       },
     });
@@ -237,7 +237,7 @@ export class TodoService {
   }
 
   // Todo削除
-  async delete(todoId: number) {
+  async delete(userId: string, todoId: number) {
     const deletedTodo = await this.prisma.todo.delete({
       where: {
         id: todoId,
@@ -246,7 +246,7 @@ export class TodoService {
 
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
-        userId: USER_2,
+        userId,
         status: deletedTodo.status,
       },
     });
