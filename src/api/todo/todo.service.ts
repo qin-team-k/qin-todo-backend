@@ -41,7 +41,7 @@ export class TodoService {
     );
 
     return {
-      TODAY: TODAY.filter(Boolean),
+      TODAY,
       TOMORROW,
       NEXT,
     };
