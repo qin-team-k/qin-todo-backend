@@ -1,13 +1,17 @@
 import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateTodoDto {
+  id?: number;
+  userId?: string;
+  // FIXME カスタムバリデーション追加
+  status: 'TODAY' | 'TOMORROW' | 'NEXT';
+  done?: boolean;
+
   @IsString()
   @IsNotEmpty()
   @MaxLength(200)
   content: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(8)
-  status: 'TODAY' | 'TOMORROW' | 'NEXT';
+  createdAt?: Date;
+  updatedAt?: Date;
 }

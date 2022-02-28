@@ -1,9 +1,7 @@
-import { IsNotEmpty, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsNumber } from 'class-validator';
 
 export class UpdateTodoOrderDto {
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(8)
+  // FIXME カスタムバリデーション追加
   status: 'TODAY' | 'TOMORROW' | 'NEXT';
 
   @IsNumber()
