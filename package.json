@@ -16,7 +16,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "docker:up": "docker-compose -f ./docker/docker-compose.yml -p qin-todo up -d",
-    "migrate": "prisma db push --preview-feature",
+    "migrate": "yarn prisma db push && npx ts-node prisma/seed/start.ts",
     "docker:down": "docker-compose -f ./docker/docker-compose.yml -p qin-todo down",
     "test": "jest",
     "test:watch": "jest --watch",
