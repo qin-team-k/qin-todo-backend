@@ -1,6 +1,8 @@
+import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { CreateTodoDto } from './dto/create-todo.dto';
+import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 
 @Injectable()
 export class TodoService {
@@ -47,7 +49,7 @@ export class TodoService {
   }
 
   // Todo作成
-  async create(userId: string, payload: Prisma.TodoCreateInput) {
+  async create(userId: string, payload: CreateTodoDto) {
     const todo = await this.prisma.todo.create({
       data: {
         content: payload.content,
@@ -146,88 +148,94 @@ export class TodoService {
   async updateOrder(
     userId: string,
     todoId: number,
-    payload: Prisma.TodoCreateInput,
-    index: number,
+    payload: UpdateTodoOrderDto,
   ) {
-    // まず対象のTodoを削除
-    const deletedTodo = await this.prisma.todo.delete({
+    // 現在のTodoを取得
+    const currentTodo = await this.prisma.todo.findUnique({
+      where: { id: todoId },
+    });
+
+    // 現在のtodoOrderを取得
+    const currentTodoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        id: todoId,
+        userId_status: {
+          userId,
+          status: currentTodo.status,
+        },
       },
     });
 
-    // todoOrderテーブルからも削除
-    const currentTodoOrders = await this.prisma.todoOrder.findMany({
-      where: {
-        userId: userId,
-        status: deletedTodo.status,
-      },
-    });
-    const currentTodoIds = currentTodoOrders[0].todoIds.split(',');
-    const deletedTodoIds = currentTodoIds.filter(
-      (todoId) => todoId !== String(deletedTodo.id),
-    );
+    // 文字配列に変換し配列から削除
+    const currentTodoIds = currentTodoOrders.todoIds.split(',');
+    const deletedTodoIds = currentTodoIds.filter((id) => id !== String(todoId));
 
-    await this.prisma.todoOrder.updateMany({
+    // 再び文字列に戻しTodoOrderを更新
+    await this.prisma.todoOrder.update({
       where: {
-        userId: currentTodoOrders[0].userId,
-        status: deletedTodo.status,
+        userId_status: {
+          userId,
+          status: currentTodo.status,
+        },
       },
       data: {
         todoIds: deletedTodoIds.join(','),
       },
     });
 
-    // 削除したTodoを引数のstatusで復活!!
-    const movedTodo = await this.prisma.todo.create({
-      data: {
-        content: deletedTodo.content,
-        userId: userId,
-        status: payload.status,
-        done: payload.done,
-      },
+    // Todoを更新
+    const updatedTodo = await this.prisma.todo.update({
+      where: { id: todoId },
+      data: { status: payload.status },
     });
 
-    // todoOrderテーブルへ追加
-    const newTodoOrders = await this.prisma.todoOrder.findMany({
+    // 更新先のtodoOrderを取得
+    const updateTodoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId: userId,
-        status: movedTodo.status,
+        userId_status: {
+          userId,
+          status: payload.status,
+        },
       },
     });
 
-    if (newTodoOrders[0].todoIds === '') {
-      newTodoOrders[0].todoIds = String(movedTodo.id);
-      await this.prisma.todoOrder.updateMany({
+    // 更新先のtodoOrderがnullかどうか
+    if (updateTodoOrders.todoIds === '') {
+      updateTodoOrders.todoIds = String(todoId);
+      await this.prisma.todoOrder.update({
         where: {
-          userId: movedTodo.userId,
-          status: payload.status,
+          userId_status: {
+            userId,
+            status: payload.status,
+          },
         },
         data: {
-          todoIds: newTodoOrders[0].todoIds,
+          todoIds: updateTodoOrders.todoIds,
         },
       });
-      return movedTodo;
+      return updatedTodo;
     } else {
-      const currentNewTodoIds = newTodoOrders[0].todoIds.split(',');
-      currentNewTodoIds.splice(index, 0, String(movedTodo.id));
+      // 文字配列に変換し新たなインデックスへ追加
+      const currentNewTodoIds = updateTodoOrders.todoIds.split(',');
+      currentNewTodoIds.splice(payload.index, 0, String(todoId));
 
-      await this.prisma.todoOrder.updateMany({
+      await this.prisma.todoOrder.update({
         where: {
-          userId: movedTodo.userId,
-          status: payload.status,
+          userId_status: {
+            userId,
+            status: payload.status,
+          },
         },
         data: {
           todoIds: currentNewTodoIds.join(','),
         },
       });
 
-      return movedTodo;
+      return updatedTodo;
     }
   }
 
   // Todo内容更新
-  updateContent(todoId: number, payload: Prisma.TodoCreateInput) {
+  updateContent(todoId: number, payload: UpdateTodoDto) {
     return this.prisma.todo.update({
       where: { id: todoId },
       data: {
@@ -244,21 +252,26 @@ export class TodoService {
       },
     });
 
-    const todoOrders = await this.prisma.todoOrder.findMany({
+    const todoOrder = await this.prisma.todoOrder.findUnique({
       where: {
-        userId,
-        status: deletedTodo.status,
+        userId_status: {
+          userId,
+          status: deletedTodo.status,
+        },
       },
     });
 
-    const currentTodoIds = todoOrders[0].todoIds.split(',');
+    const currentTodoIds = todoOrder.todoIds.split(',');
     const deletedTodoIds = currentTodoIds.filter(
-      (todoId) => todoId !== String(deletedTodo.id),
+      (id) => id !== String(deletedTodo.id),
     );
-    await this.prisma.todoOrder.updateMany({
+
+    await this.prisma.todoOrder.update({
       where: {
-        userId: todoOrders[0].userId,
-        status: deletedTodo.status,
+        userId_status: {
+          userId,
+          status: deletedTodo.status,
+        },
       },
       data: {
         todoIds: deletedTodoIds.join(','),
