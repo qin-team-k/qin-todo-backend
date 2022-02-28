@@ -1,3 +1,4 @@
+import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Prisma } from '@prisma/client';
 import {
   Body,
@@ -11,6 +12,8 @@ import {
   Version,
 } from '@nestjs/common';
 import { TodoService } from './todo.service';
+import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
+import { CreateTodoDto } from './dto/create-todo.dto';
 
 @Controller('todos')
 export class TodoController {
@@ -27,7 +30,7 @@ export class TodoController {
   // Todo作成
   @Version('1')
   @Post()
-  create(@Body() body: Prisma.TodoCreateInput) {
+  create(@Body() body: CreateTodoDto) {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.create(userId, body);
   }
@@ -50,14 +53,13 @@ export class TodoController {
 
   // Todo並び替え
   @Version('1')
-  @Put(':todoId/:index/order')
+  @Put(':todoId/order')
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @Body() body: Prisma.TodoCreateInput,
-    @Param('index', ParseIntPipe) index: number,
+    @Body() body: UpdateTodoOrderDto,
   ) {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.updateOrder(userId, todoId, body, index);
+    return this.todoService.updateOrder(userId, todoId, body);
   }
 
   // Todo内容更新
@@ -65,7 +67,7 @@ export class TodoController {
   @Put(':todoId')
   updateContent(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @Body() body: Prisma.TodoCreateInput,
+    @Body() body: UpdateTodoDto,
   ) {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateContent(todoId, body);

@@ -9,5 +9,5 @@ export class CreateTodoDto {
   @IsString()
   @IsNotEmpty()
   @MaxLength(8)
-  status: string;
+  status: 'TODAY' | 'TOMORROW' | 'NEXT';
 }
