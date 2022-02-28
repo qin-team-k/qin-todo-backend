@@ -6,9 +6,9 @@ import { user } from './user';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.deleteMany();
-  await prisma.todo.deleteMany();
   await prisma.todoOrder.deleteMany();
+  await prisma.todo.deleteMany();
+  await prisma.user.deleteMany();
   await user();
   await todo();
   await todoOrder();
