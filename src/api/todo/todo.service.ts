@@ -31,7 +31,11 @@ export class TodoService {
     const tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
     const nextTodoIds = nextTodoOrder[0].todoIds.split(',');
 
-    const todos = await this.prisma.todo.findMany();
+    const todos = await this.prisma.todo.findMany({
+      where: {
+        userId,
+      },
+    });
 
     const TOMORROW = tomorrowTodoIds.map((id) =>
       todos.find((todo) => todo.id === Number(id)),
