@@ -17,7 +17,7 @@ model User {
   todos      Todo[]
   todoStatus TodoOrder[]
 
-  @@map("t_user")
+  @@map("user")
 }
 
 model Todo {
@@ -30,7 +30,7 @@ model Todo {
   updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
   User      User       @relation(fields: [userId], references: [id])
 
-  @@map("t_todo")
+  @@map("todo")
 }
 
 model TodoOrder {
@@ -41,7 +41,7 @@ model TodoOrder {
   User    User       @relation(fields: [userId], references: [id])
 
   @@unique([userId, status])
-  @@map("t_todo_order")
+  @@map("todo_order")
 }
 
 enum TodoStatus {
