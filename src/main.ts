@@ -12,6 +12,8 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  app.setGlobalPrefix('api');
+
   app.enableVersioning({
     type: VersioningType.URI,
   });
