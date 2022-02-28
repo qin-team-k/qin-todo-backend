@@ -20,7 +20,7 @@ export const todoOrder = async () => {
         id: 3,
         userId: '4ff64eb1-c22a-4455-a50d-75cdc3c1e561',
         status: 'NEXT',
-        todoIds: '8,10,11,12',
+        todoIds: '9,10,11,12',
       },
       {
         id: 4,
