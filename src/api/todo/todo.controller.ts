@@ -20,7 +20,7 @@ export class TodoController {
   @Version('1')
   @Get()
   findAll() {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.findAll(userId);
   }
 
@@ -28,7 +28,7 @@ export class TodoController {
   @Version('1')
   @Post()
   create(@Body() body: Prisma.TodoCreateInput) {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.create(userId, body);
   }
 
@@ -36,7 +36,7 @@ export class TodoController {
   @Version('1')
   @Post(':todoId/duplicate')
   duplicate(@Param('todoId', ParseIntPipe) todoId: number) {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.duplicate(userId, todoId);
   }
 
@@ -44,7 +44,7 @@ export class TodoController {
   @Version('1')
   @Put(':todoId/toggle')
   toggleDone(@Param('todoId', ParseIntPipe) todoId: number) {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.toggleDone(todoId);
   }
 
@@ -56,7 +56,7 @@ export class TodoController {
     @Body() body: Prisma.TodoCreateInput,
     @Param('index', ParseIntPipe) index: number,
   ) {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateOrder(userId, todoId, body, index);
   }
 
@@ -67,7 +67,7 @@ export class TodoController {
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() body: Prisma.TodoCreateInput,
   ) {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateContent(todoId, body);
   }
 
@@ -75,7 +75,7 @@ export class TodoController {
   @Version('1')
   @Delete(':todoId')
   delete(@Param('todoId', ParseIntPipe) todoId: number) {
-    const userId = 'e76db267-066e-4e33-869c-508e41bb1a7d';
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.delete(userId, todoId);
   }
 }
