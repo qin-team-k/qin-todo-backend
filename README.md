@@ -34,14 +34,24 @@ yarn pre:all
 # api/dbの起動
 yarn run docker:up
 
+# db migrate
+yarn migrate
+
 # 開発環境の起動
 yarn run start:dev
 
-# セットアップ確認
-curl --location --request GET 'http://localhost:3000/healthcheck'
-
-# api/dbの終了
+# api/dbの終了(終了時に実行)
 yarn run docker:down
+```
+
+
+## セットアップ確認
+```
+prisma studio(db確認)
+yarn prisma studio
+
+api実行
+curl --location --request GET 'http://localhost:3000/healthcheck'
 ```
 
 ## テスト実行
