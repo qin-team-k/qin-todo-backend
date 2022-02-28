@@ -3,13 +3,15 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
+import { Todo } from '@prisma/client';
+import { FindAllDto } from './dto/find-all-dto';
 
 @Injectable()
 export class TodoService {
   constructor(private prisma: PrismaService) {}
 
   // Todo一覧取得
-  async findAll(userId) {
+  async findAll(userId: string): Promise<FindAllDto> {
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
         userId,
@@ -49,7 +51,7 @@ export class TodoService {
   }
 
   // Todo作成
-  async create(userId: string, payload: CreateTodoDto) {
+  async create(userId: string, payload: CreateTodoDto): Promise<CreateTodoDto> {
     const todo = await this.prisma.todo.create({
       data: {
         content: payload.content,
@@ -93,7 +95,7 @@ export class TodoService {
   }
 
   // Todo複製
-  async duplicate(userId: string, todoId: number) {
+  async duplicate(userId: string, todoId: number): Promise<CreateTodoDto> {
     const todo = await this.prisma.todo.findUnique({
       where: { id: todoId },
     });
@@ -128,7 +130,7 @@ export class TodoService {
   }
 
   // 完了・未完了の切り替え
-  async toggleDone(todoId: number) {
+  async toggleDone(todoId: number): Promise<CreateTodoDto> {
     const todo = await this.prisma.todo.findUnique({
       where: {
         id: todoId,
@@ -149,7 +151,7 @@ export class TodoService {
     userId: string,
     todoId: number,
     payload: UpdateTodoOrderDto,
-  ) {
+  ): Promise<CreateTodoDto> {
     // 現在のTodoを取得
     const currentTodo = await this.prisma.todo.findUnique({
       where: { id: todoId },
@@ -198,6 +200,7 @@ export class TodoService {
       },
     });
 
+    // FIXME リファクタ
     // 更新先のtodoOrderがnullかどうか
     if (updateTodoOrders.todoIds === '') {
       updateTodoOrders.todoIds = String(todoId);
@@ -235,7 +238,10 @@ export class TodoService {
   }
 
   // Todo内容更新
-  updateContent(todoId: number, payload: UpdateTodoDto) {
+  updateContent(
+    todoId: number,
+    payload: UpdateTodoDto,
+  ): Promise<CreateTodoDto> {
     return this.prisma.todo.update({
       where: { id: todoId },
       data: {
@@ -245,7 +251,7 @@ export class TodoService {
   }
 
   // Todo削除
-  async delete(userId: string, todoId: number) {
+  async delete(userId: string, todoId: number): Promise<void> {
     const deletedTodo = await this.prisma.todo.delete({
       where: {
         id: todoId,
@@ -277,6 +283,5 @@ export class TodoService {
         todoIds: deletedTodoIds.join(','),
       },
     });
-    return deletedTodo;
   }
 }

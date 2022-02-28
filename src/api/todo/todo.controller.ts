@@ -14,6 +14,7 @@ import {
 import { TodoService } from './todo.service';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
+import { FindAllDto } from './dto/find-all-dto';
 
 @Controller('todos')
 export class TodoController {
@@ -22,7 +23,7 @@ export class TodoController {
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll() {
+  findAll(): Promise<FindAllDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.findAll(userId);
   }
@@ -30,7 +31,7 @@ export class TodoController {
   // Todo作成
   @Version('1')
   @Post()
-  create(@Body() body: CreateTodoDto) {
+  create(@Body() body: CreateTodoDto): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.create(userId, body);
   }
@@ -38,7 +39,9 @@ export class TodoController {
   // Todo複製
   @Version('1')
   @Post(':todoId/duplicate')
-  duplicate(@Param('todoId', ParseIntPipe) todoId: number) {
+  duplicate(
+    @Param('todoId', ParseIntPipe) todoId: number,
+  ): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.duplicate(userId, todoId);
   }
@@ -46,7 +49,9 @@ export class TodoController {
   // 完了・未完了の切り替え
   @Version('1')
   @Put(':todoId/toggle')
-  toggleDone(@Param('todoId', ParseIntPipe) todoId: number) {
+  toggleDone(
+    @Param('todoId', ParseIntPipe) todoId: number,
+  ): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.toggleDone(todoId);
   }
@@ -57,7 +62,7 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() body: UpdateTodoOrderDto,
-  ) {
+  ): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateOrder(userId, todoId, body);
   }
@@ -68,7 +73,7 @@ export class TodoController {
   updateContent(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() body: UpdateTodoDto,
-  ) {
+  ): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateContent(todoId, body);
   }
@@ -76,7 +81,7 @@ export class TodoController {
   // Todo削除
   @Version('1')
   @Delete(':todoId')
-  delete(@Param('todoId', ParseIntPipe) todoId: number) {
+  delete(@Param('todoId', ParseIntPipe) todoId: number): Promise<void> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.delete(userId, todoId);
   }
