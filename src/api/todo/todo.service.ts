@@ -4,6 +4,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { FindAllDto } from './dto/find-all-dto';
+import { Todo } from '@prisma/client';
 
 @Injectable()
 export class TodoService {
@@ -55,7 +56,7 @@ export class TodoService {
 
   // Todo作成
   // FIXME トランザクションを追加
-  async create(userId: string, todo: CreateTodoDto): Promise<CreateTodoDto> {
+  async create(userId: string, todo: CreateTodoDto): Promise<Todo> {
     const createdTodo = await this.prisma.todo.create({
       data: {
         content: todo.content,
@@ -100,7 +101,7 @@ export class TodoService {
 
   // Todo複製
   // FIXME トランザクションを追加
-  async duplicate(userId: string, todoId: number): Promise<CreateTodoDto> {
+  async duplicate(userId: string, todoId: number): Promise<Todo> {
     const todo = await this.prisma.todo.findUnique({
       where: { id: todoId },
     });
@@ -135,7 +136,7 @@ export class TodoService {
   }
 
   // 完了・未完了の切り替え
-  async toggleDone(todoId: number): Promise<CreateTodoDto> {
+  async toggleDone(todoId: number): Promise<Todo> {
     const todo = await this.prisma.todo.findUnique({
       where: {
         id: todoId,
@@ -157,7 +158,7 @@ export class TodoService {
     userId: string,
     todoId: number,
     todo: UpdateTodoOrderDto,
-  ): Promise<CreateTodoDto> {
+  ): Promise<Todo> {
     // 現在のTodoを取得
     const currentTodo = await this.prisma.todo.findUnique({
       where: { id: todoId },
@@ -245,7 +246,7 @@ export class TodoService {
   }
 
   // Todo内容更新
-  updateContent(todoId: number, todo: UpdateTodoDto): Promise<CreateTodoDto> {
+  updateContent(todoId: number, todo: UpdateTodoDto): Promise<Todo> {
     return this.prisma.todo.update({
       where: { id: todoId },
       data: {
