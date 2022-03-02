@@ -13,7 +13,7 @@ import {
 import { TodoService } from './todo.service';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
-import { FindAllDto } from './dto/find-all-dto';
+import { FindAllRes } from './response/findAll.response.';
 import { Todo } from '@prisma/client';
 
 @Controller('todos')
@@ -23,7 +23,7 @@ export class TodoController {
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll(): Promise<FindAllDto> {
+  findAll(): Promise<FindAllRes> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.findAll(userId);
   }

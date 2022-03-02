@@ -1,5 +1,5 @@
 import { Todo } from '@prisma/client';
-export class FindAllDto {
+export class FindAllRes {
   'TODAY': Todo[];
   'TOMORROW': Todo[];
   'NEXT': Todo[];

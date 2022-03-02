@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
-import { FindAllDto } from './dto/find-all-dto';
+import { FindAllRes } from './response/findAll.response.';
 import { Todo } from '@prisma/client';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class TodoService {
   constructor(private prisma: PrismaService) {}
 
   // Todo一覧取得
-  async findAll(userId: string): Promise<FindAllDto> {
+  async findAll(userId: string): Promise<FindAllRes> {
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
         userId,
