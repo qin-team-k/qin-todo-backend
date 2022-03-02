@@ -1,7 +1,7 @@
-import { IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
 
 export class UpdateTodoOrderDto {
-  // FIXME カスタムバリデーション追加
+  @IsEnum(['TODAY', 'TOMORROW', 'NEXT'])
   status: 'TODAY' | 'TOMORROW' | 'NEXT';
 
   @IsNumber()

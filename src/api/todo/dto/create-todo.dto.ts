@@ -1,8 +1,7 @@
-import { IsNotEmpty, IsString, MaxLength, IsNumber } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, IsEnum } from 'class-validator';
 
 export class CreateTodoDto {
-  // FIXME カスタムバリデーション追加
-  @IsNotEmpty()
+  @IsEnum(['TODAY', 'TOMORROW', 'NEXT'])
   status: 'TODAY' | 'TOMORROW' | 'NEXT';
 
   @IsString()
