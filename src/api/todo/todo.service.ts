@@ -55,19 +55,19 @@ export class TodoService {
   }
 
   // Todo作成
-  async create(userId: string, payload: CreateTodoDto): Promise<CreateTodoDto> {
-    const todo = await this.prisma.todo.create({
+  async create(userId: string, todo: CreateTodoDto): Promise<CreateTodoDto> {
+    const createdTodo = await this.prisma.todo.create({
       data: {
-        content: payload.content,
+        content: todo.content,
         userId,
-        status: payload.status,
+        status: todo.status,
       },
     });
 
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
         userId: todo.userId,
-        status: payload.status,
+        status: todo.status,
       },
     });
 
@@ -75,26 +75,26 @@ export class TodoService {
       await this.prisma.todoOrder.updateMany({
         where: {
           userId: todo.userId,
-          status: payload.status,
+          status: todo.status,
         },
         data: {
           todoIds: `${todo.id}`,
         },
       });
-      return todo;
+      return createdTodo;
     } else {
       const currentTodoIds = todoOrders[0].todoIds.split(',');
       currentTodoIds.push(String(todo.id));
       await this.prisma.todoOrder.updateMany({
         where: {
           userId: todo.userId,
-          status: payload.status,
+          status: todo.status,
         },
         data: {
           todoIds: currentTodoIds.join(','),
         },
       });
-      return todo;
+      return createdTodo;
     }
   }
 
@@ -154,7 +154,7 @@ export class TodoService {
   async updateOrder(
     userId: string,
     todoId: number,
-    payload: UpdateTodoOrderDto,
+    todo: UpdateTodoOrderDto,
   ): Promise<CreateTodoDto> {
     // 現在のTodoを取得
     const currentTodo = await this.prisma.todo.findUnique({
@@ -191,7 +191,7 @@ export class TodoService {
     // Todoを更新
     const updatedTodo = await this.prisma.todo.update({
       where: { id: todoId },
-      data: { status: payload.status },
+      data: { status: todo.status },
     });
 
     // 更新先のtodoOrderを取得
@@ -199,7 +199,7 @@ export class TodoService {
       where: {
         userId_status: {
           userId,
-          status: payload.status,
+          status: todo.status,
         },
       },
     });
@@ -212,7 +212,7 @@ export class TodoService {
         where: {
           userId_status: {
             userId,
-            status: payload.status,
+            status: todo.status,
           },
         },
         data: {
@@ -223,13 +223,13 @@ export class TodoService {
     } else {
       // 文字配列に変換し新たなインデックスへ追加
       const currentNewTodoIds = updateTodoOrders.todoIds.split(',');
-      currentNewTodoIds.splice(payload.index, 0, String(todoId));
+      currentNewTodoIds.splice(todo.index, 0, String(todoId));
 
       await this.prisma.todoOrder.update({
         where: {
           userId_status: {
             userId,
-            status: payload.status,
+            status: todo.status,
           },
         },
         data: {
@@ -242,14 +242,11 @@ export class TodoService {
   }
 
   // Todo内容更新
-  updateContent(
-    todoId: number,
-    payload: UpdateTodoDto,
-  ): Promise<CreateTodoDto> {
+  updateContent(todoId: number, todo: UpdateTodoDto): Promise<CreateTodoDto> {
     return this.prisma.todo.update({
       where: { id: todoId },
       data: {
-        content: payload.content,
+        content: todo.content,
       },
     });
   }
