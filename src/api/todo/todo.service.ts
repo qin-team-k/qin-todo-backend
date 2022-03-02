@@ -83,13 +83,13 @@ export class TodoService {
           },
         },
         data: {
-          todoIds: `${todo.id}`,
+          todoIds: `${createdTodo.id}`,
         },
       });
       return createdTodo;
     } else {
       const currentTodoIds = todoOrders.todoIds.split(',');
-      currentTodoIds.push(String(todo.id));
+      currentTodoIds.push(String(createdTodo.id));
       await this.prisma.todoOrder.update({
         where: {
           userId_status: {
