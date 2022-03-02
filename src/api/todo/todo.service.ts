@@ -55,6 +55,7 @@ export class TodoService {
   }
 
   // Todo作成
+  // FIXME トランザクションを追加
   async create(userId: string, todo: CreateTodoDto): Promise<CreateTodoDto> {
     const createdTodo = await this.prisma.todo.create({
       data: {
@@ -99,6 +100,7 @@ export class TodoService {
   }
 
   // Todo複製
+  // FIXME トランザクションを追加
   async duplicate(userId: string, todoId: number): Promise<CreateTodoDto> {
     const todo = await this.prisma.todo.findUnique({
       where: { id: todoId },
@@ -151,6 +153,7 @@ export class TodoService {
   }
 
   // Todo並び替え
+  // FIXME トランザクションを追加
   async updateOrder(
     userId: string,
     todoId: number,
@@ -252,6 +255,7 @@ export class TodoService {
   }
 
   // Todo削除
+  // FIXME トランザクションを追加
   async delete(userId: string, todoId: number): Promise<void> {
     const deletedTodo = await this.prisma.todo.delete({
       where: {
