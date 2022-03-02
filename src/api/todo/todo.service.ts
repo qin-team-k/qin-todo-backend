@@ -175,8 +175,9 @@ export class TodoService {
     });
 
     // 文字配列に変換し配列から削除
-    const currentTodoIds = currentTodoOrders.todoIds.split(',');
-    const deletedTodoIds = currentTodoIds.filter((id) => id !== String(todoId));
+    const updatedTodoIds = currentTodoOrders.todoIds
+      .split(',')
+      .filter((id) => id !== String(todoId));
 
     // 再び文字列に戻しTodoOrderを更新
     await this.prisma.todoOrder.update({
@@ -187,7 +188,7 @@ export class TodoService {
         },
       },
       data: {
-        todoIds: deletedTodoIds.join(','),
+        todoIds: updatedTodoIds.join(','),
       },
     });
 
