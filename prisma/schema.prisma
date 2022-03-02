@@ -9,7 +9,7 @@ datasource db {
 
 model User {
   id         String      @id
-  username   String      @map("user_name") @db.VarChar(100)
+  username   String      @map("username") @db.VarChar(100)
   email      String      @unique @db.VarChar(191)
   avatarUrl  String      @map("avatar_url") @db.VarChar(255)
   createdAt  DateTime    @default(now()) @map("created_at")
