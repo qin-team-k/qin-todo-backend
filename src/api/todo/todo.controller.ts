@@ -1,5 +1,4 @@
 import { UpdateTodoDto } from './dto/update-todo.dto';
-import { Prisma } from '@prisma/client';
 import {
   Body,
   Controller,
