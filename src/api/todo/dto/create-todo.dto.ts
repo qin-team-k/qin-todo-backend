@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsString, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, IsNumber } from 'class-validator';
 
 export class CreateTodoDto {
   @IsNumber()
@@ -6,6 +6,7 @@ export class CreateTodoDto {
   id?: number;
 
   // FIXME カスタムバリデーション追加
+  @IsNotEmpty()
   status: 'TODAY' | 'TOMORROW' | 'NEXT';
 
   @IsString()
