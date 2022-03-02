@@ -14,6 +14,7 @@ import { TodoService } from './todo.service';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { FindAllDto } from './dto/find-all-dto';
+import { Todo } from '@prisma/client';
 
 @Controller('todos')
 export class TodoController {
@@ -30,7 +31,7 @@ export class TodoController {
   // Todo作成
   @Version('1')
   @Post()
-  create(@Body() todo: CreateTodoDto): Promise<CreateTodoDto> {
+  create(@Body() todo: CreateTodoDto): Promise<Todo> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.create(userId, todo);
   }
@@ -38,9 +39,7 @@ export class TodoController {
   // Todo複製
   @Version('1')
   @Post(':todoId/duplicate')
-  duplicate(
-    @Param('todoId', ParseIntPipe) todoId: number,
-  ): Promise<CreateTodoDto> {
+  duplicate(@Param('todoId', ParseIntPipe) todoId: number): Promise<Todo> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.duplicate(userId, todoId);
   }
@@ -48,9 +47,7 @@ export class TodoController {
   // 完了・未完了の切り替え
   @Version('1')
   @Put(':todoId/toggle')
-  toggleDone(
-    @Param('todoId', ParseIntPipe) todoId: number,
-  ): Promise<CreateTodoDto> {
+  toggleDone(@Param('todoId', ParseIntPipe) todoId: number): Promise<Todo> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.toggleDone(todoId);
   }
@@ -61,7 +58,7 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
-  ): Promise<CreateTodoDto> {
+  ): Promise<Todo> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateOrder(userId, todoId, todo);
   }
@@ -72,7 +69,7 @@ export class TodoController {
   updateContent(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoDto,
-  ): Promise<CreateTodoDto> {
+  ): Promise<Todo> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateContent(todoId, todo);
   }
