@@ -1,8 +1,9 @@
+import { TodoStatus } from '@prisma/client';
 import { IsNotEmpty, IsString, MaxLength, IsEnum } from 'class-validator';
 
 export class CreateTodoDto {
-  @IsEnum(['TODAY', 'TOMORROW', 'NEXT'])
-  status: 'TODAY' | 'TOMORROW' | 'NEXT';
+  @IsEnum(TodoStatus)
+  status: TodoStatus;
 
   @IsString()
   @IsNotEmpty()
