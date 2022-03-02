@@ -65,18 +65,22 @@ export class TodoService {
       },
     });
 
-    const todoOrders = await this.prisma.todoOrder.findMany({
+    const todoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId,
-        status: todo.status,
+        userId_status: {
+          userId,
+          status: todo.status,
+        },
       },
     });
 
-    if (todoOrders[0].todoIds === '') {
-      await this.prisma.todoOrder.updateMany({
+    if (todoOrders.todoIds === '') {
+      await this.prisma.todoOrder.update({
         where: {
-          userId,
-          status: todo.status,
+          userId_status: {
+            userId,
+            status: todo.status,
+          },
         },
         data: {
           todoIds: `${todo.id}`,
@@ -84,12 +88,14 @@ export class TodoService {
       });
       return createdTodo;
     } else {
-      const currentTodoIds = todoOrders[0].todoIds.split(',');
+      const currentTodoIds = todoOrders.todoIds.split(',');
       currentTodoIds.push(String(todo.id));
-      await this.prisma.todoOrder.updateMany({
+      await this.prisma.todoOrder.update({
         where: {
-          userId,
-          status: todo.status,
+          userId_status: {
+            userId,
+            status: todo.status,
+          },
         },
         data: {
           todoIds: currentTodoIds.join(','),
