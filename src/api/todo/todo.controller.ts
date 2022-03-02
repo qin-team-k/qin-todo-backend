@@ -31,9 +31,9 @@ export class TodoController {
   // Todo作成
   @Version('1')
   @Post()
-  create(@Body() body: CreateTodoDto): Promise<CreateTodoDto> {
+  create(@Body() todo: CreateTodoDto): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.create(userId, body);
+    return this.todoService.create(userId, todo);
   }
 
   // Todo複製
@@ -61,10 +61,10 @@ export class TodoController {
   @Put(':todoId/order')
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @Body() body: UpdateTodoOrderDto,
+    @Body() todo: UpdateTodoOrderDto,
   ): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.updateOrder(userId, todoId, body);
+    return this.todoService.updateOrder(userId, todoId, todo);
   }
 
   // Todo内容更新
@@ -72,10 +72,10 @@ export class TodoController {
   @Put(':todoId')
   updateContent(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @Body() body: UpdateTodoDto,
+    @Body() todo: UpdateTodoDto,
   ): Promise<CreateTodoDto> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.updateContent(todoId, body);
+    return this.todoService.updateContent(todoId, todo);
   }
 
   // Todo削除
