@@ -67,7 +67,7 @@ export class TodoService {
 
     const todoOrders = await this.prisma.todoOrder.findMany({
       where: {
-        userId: todo.userId,
+        userId,
         status: todo.status,
       },
     });
@@ -75,7 +75,7 @@ export class TodoService {
     if (todoOrders[0].todoIds === '') {
       await this.prisma.todoOrder.updateMany({
         where: {
-          userId: todo.userId,
+          userId,
           status: todo.status,
         },
         data: {
@@ -88,7 +88,7 @@ export class TodoService {
       currentTodoIds.push(String(todo.id));
       await this.prisma.todoOrder.updateMany({
         where: {
-          userId: todo.userId,
+          userId,
           status: todo.status,
         },
         data: {

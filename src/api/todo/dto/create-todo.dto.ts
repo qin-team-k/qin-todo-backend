@@ -2,7 +2,6 @@ import { IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreateTodoDto {
   id?: number;
-  userId?: string;
   // FIXME カスタムバリデーション追加
   status: 'TODAY' | 'TOMORROW' | 'NEXT';
   done?: boolean;
