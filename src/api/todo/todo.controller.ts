@@ -58,7 +58,7 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
-  ): Promise<Todo> {
+  ): Promise<void> {
     const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateOrder(userId, todoId, todo);
   }

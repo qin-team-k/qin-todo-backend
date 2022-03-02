@@ -164,7 +164,7 @@ export class TodoService {
     userId: string,
     todoId: number,
     todo: UpdateTodoOrderDto,
-  ): Promise<Todo> {
+  ): Promise<void> {
     // 現在のTodoを取得
     const currentTodo = await this.prisma.todo.findUnique({
       where: { id: todoId },
@@ -229,7 +229,6 @@ export class TodoService {
           todoIds: updateTodoOrders.todoIds,
         },
       });
-      return updatedTodo;
     } else {
       // 文字配列に変換し新たなインデックスへ追加
       const currentNewTodoIds = updateTodoOrders.todoIds.split(',');
@@ -246,8 +245,6 @@ export class TodoService {
           todoIds: currentNewTodoIds.join(','),
         },
       });
-
-      return updatedTodo;
     }
   }
 
