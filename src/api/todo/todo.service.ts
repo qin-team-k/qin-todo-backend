@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
-import { Todo } from '@prisma/client';
 import { FindAllDto } from './dto/find-all-dto';
 
 @Injectable()
