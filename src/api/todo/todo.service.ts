@@ -181,12 +181,10 @@ export class TodoService {
     });
 
     // 文字配列に変換し配列から削除
-    const updatedTodoIds = currentTodoOrders.todoIds
+    const deletedTodoIds = currentTodoOrders.todoIds
       .split(',')
       .filter((id) => id !== String(todoId));
-
-    // 再び文字列に戻しTodoOrderを更新
-    await this.prisma.todoOrder.update({
+    const deletedTodoOrder = await this.prisma.todoOrder.update({
       where: {
         userId_status: {
           userId,
@@ -194,9 +192,23 @@ export class TodoService {
         },
       },
       data: {
-        todoIds: updatedTodoIds.join(','),
+        todoIds: deletedTodoIds.join(','),
       },
     });
+
+    if (!deletedTodoOrder.todoIds) {
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: currentTodo.status,
+          },
+        },
+        data: {
+          todoIds: null,
+        },
+      });
+    }
 
     // Todoを更新
     const updatedTodo = await this.prisma.todo.update({
@@ -216,7 +228,22 @@ export class TodoService {
 
     // FIXME リファクタ
     // 更新先のtodoOrderがnullかどうか
-    if (updateTodoOrders.todoIds === '') {
+    if (updateTodoOrders.todoIds) {
+      const newTodoIds = updateTodoOrders.todoIds.split(',');
+      newTodoIds.splice(todo.index, 0, String(todoId));
+
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: todo.status,
+          },
+        },
+        data: {
+          todoIds: newTodoIds.join(','),
+        },
+      });
+    } else {
       updateTodoOrders.todoIds = String(todoId);
       await this.prisma.todoOrder.update({
         where: {
@@ -227,22 +254,6 @@ export class TodoService {
         },
         data: {
           todoIds: updateTodoOrders.todoIds,
-        },
-      });
-    } else {
-      // 文字配列に変換し新たなインデックスへ追加
-      const currentNewTodoIds = updateTodoOrders.todoIds.split(',');
-      currentNewTodoIds.splice(todo.index, 0, String(todoId));
-
-      await this.prisma.todoOrder.update({
-        where: {
-          userId_status: {
-            userId,
-            status: todo.status,
-          },
-        },
-        data: {
-          todoIds: currentNewTodoIds.join(','),
         },
       });
     }
