@@ -113,9 +113,9 @@ export class TodoService {
     });
     const duplicatedTodo = await this.prisma.todo.create({
       data: {
-        content: todo.content,
         userId,
         status: todo.status,
+        content: todo.content,
       },
     });
 
