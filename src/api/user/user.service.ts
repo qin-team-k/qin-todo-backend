@@ -5,13 +5,12 @@ import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(private prisma: PrismaService) {}
   async createUser(userBody: UserDto): Promise<User> {
     const url =
       'https://gravatar.com/avatar/4eb616d78c7f80ce3924e825a55e6b73?s=400&d=robohash&r=x';
-    return this.prismaService.user.create({
+    return this.prisma.user.create({
       data: {
-        id: '123',
         username: userBody.username,
         email: userBody.email,
         avatarUrl: userBody.avatarUrl,
