@@ -119,19 +119,23 @@ export class TodoService {
       },
     });
 
-    const todoOrders = await this.prisma.todoOrder.findMany({
+    const todoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId: todo.userId,
-        status: todo.status,
+        userId_status: {
+          userId,
+          status: todo.status,
+        },
       },
     });
-    const currentTodoIds = todoOrders[0].todoIds.split(',');
+    const currentTodoIds = todoOrders.todoIds.split(',');
     const todoIdIndex = currentTodoIds.indexOf(String(todo.id));
     currentTodoIds.splice(todoIdIndex + 1, 0, String(duplicatedTodo.id));
-    await this.prisma.todoOrder.updateMany({
+    await this.prisma.todoOrder.update({
       where: {
-        userId: todo.userId,
-        status: todo.status,
+        userId_status: {
+          userId,
+          status: todo.status,
+        },
       },
       data: {
         todoIds: currentTodoIds.join(','),
