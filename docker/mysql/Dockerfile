@@ -1,4 +1,4 @@
-FROM mysql:8.0
+FROM mysql:5.7
 
 RUN /bin/cp -f /etc/localtime /etc/localtime.org
 RUN /bin/cp -f /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
