@@ -44,14 +44,14 @@ yarn run start:dev
 yarn run docker:down
 ```
 
-
 ## セットアップ確認
+
 ```
 prisma studio(db確認)
 yarn prisma studio
 
 api実行
-curl --location --request GET 'http://localhost:3000/healthcheck'
+curl --location --request GET 'http://localhost:3000/api/healthcheck'
 ```
 
 ## テスト実行
@@ -106,6 +106,8 @@ feature/[対応する issue 番号]-[作業の概要]
 │   │       ├── todo.service.ts
 │   │       ├── dto
 │   │       │   └── create-todo.dto.ts
+│   │       ├── response
+│   │       │   └── findAll.response.ts
 │   │       └── interfaces
 │   │           └── todo.interface.ts
 │   ├── common
