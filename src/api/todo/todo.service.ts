@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { FindAllRes } from './response/findAll.response.';
-import { Todo } from '@prisma/client';
+import { Todo, TodoStatus } from '@prisma/client';
 
 @Injectable()
 export class TodoService {
@@ -18,13 +18,13 @@ export class TodoService {
       },
     });
     const todayTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === 'TODAY',
+      (todoOrder) => todoOrder.status === TodoStatus.TODAY,
     );
     const tomorrowTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === 'TOMORROW',
+      (todoOrder) => todoOrder.status === TodoStatus.TOMORROW,
     );
     const nextTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === 'NEXT',
+      (todoOrder) => todoOrder.status === TodoStatus.NEXT,
     );
 
     const todayTodoIds = todayTodoOrder[0].todoIds.split(',');
