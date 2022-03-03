@@ -281,16 +281,30 @@ export class TodoService {
       (id) => id !== String(deletedTodo.id),
     );
 
-    await this.prisma.todoOrder.update({
-      where: {
-        userId_status: {
-          userId,
-          status: deletedTodo.status,
+    if (deletedTodoIds.length === 0) {
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: deletedTodo.status,
+          },
         },
-      },
-      data: {
-        todoIds: deletedTodoIds.join(','),
-      },
-    });
+        data: {
+          todoIds: null,
+        },
+      });
+    } else {
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: deletedTodo.status,
+          },
+        },
+        data: {
+          todoIds: deletedTodoIds.join(','),
+        },
+      });
+    }
   }
 }
