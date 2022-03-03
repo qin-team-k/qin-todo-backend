@@ -281,7 +281,7 @@ export class TodoService {
       (id) => id !== String(deletedTodo.id),
     );
 
-    if (deletedTodoIds.length === 0) {
+    if (deletedTodoIds.length) {
       await this.prisma.todoOrder.update({
         where: {
           userId_status: {
@@ -290,7 +290,7 @@ export class TodoService {
           },
         },
         data: {
-          todoIds: null,
+          todoIds: deletedTodoIds.join(','),
         },
       });
     } else {
@@ -302,7 +302,7 @@ export class TodoService {
           },
         },
         data: {
-          todoIds: deletedTodoIds.join(','),
+          todoIds: null,
         },
       });
     }
