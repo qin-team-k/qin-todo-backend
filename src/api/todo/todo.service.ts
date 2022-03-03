@@ -1,8 +1,8 @@
-import { UpdateTodoDto } from './dto/update-todo.dto';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 import { FindAllRes } from './response/findAll.response.';
 import { Todo, TodoStatus } from '@prisma/client';
 
@@ -27,9 +27,27 @@ export class TodoService {
       (todoOrder) => todoOrder.status === TodoStatus.NEXT,
     );
 
-    const todayTodoIds = todayTodoOrder[0].todoIds.split(',');
-    const tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
-    const nextTodoIds = nextTodoOrder[0].todoIds.split(',');
+    let todayTodoIds: string[];
+    let tomorrowTodoIds: string[];
+    let nextTodoIds: string[];
+
+    if (todayTodoOrder[0].todoIds) {
+      todayTodoIds = todayTodoOrder[0].todoIds.split(',');
+    } else {
+      todayTodoIds = [];
+    }
+
+    if (tomorrowTodoOrder[0].todoIds) {
+      tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
+    } else {
+      tomorrowTodoIds = [];
+    }
+
+    if (nextTodoOrder[0].todoIds) {
+      nextTodoIds = nextTodoOrder[0].todoIds.split(',');
+    } else {
+      nextTodoIds = [];
+    }
 
     const todos = await this.prisma.todo.findMany({
       where: {
@@ -185,12 +203,10 @@ export class TodoService {
     });
 
     // 文字配列に変換し配列から削除
-    const updatedTodoIds = currentTodoOrders.todoIds
+    const deletedTodoIds = currentTodoOrders.todoIds
       .split(',')
       .filter((id) => id !== String(todoId));
-
-    // 再び文字列に戻しTodoOrderを更新
-    await this.prisma.todoOrder.update({
+    const deletedTodoOrder = await this.prisma.todoOrder.update({
       where: {
         userId_status: {
           userId,
@@ -198,9 +214,23 @@ export class TodoService {
         },
       },
       data: {
-        todoIds: updatedTodoIds.join(','),
+        todoIds: deletedTodoIds.join(','),
       },
     });
+
+    if (!deletedTodoOrder.todoIds) {
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: currentTodo.status,
+          },
+        },
+        data: {
+          todoIds: null,
+        },
+      });
+    }
 
     // Todoを更新
     const updatedTodo = await this.prisma.todo.update({
@@ -220,7 +250,22 @@ export class TodoService {
 
     // FIXME リファクタ
     // 更新先のtodoOrderがnullかどうか
-    if (updateTodoOrders.todoIds === '') {
+    if (updateTodoOrders.todoIds) {
+      const newTodoIds = updateTodoOrders.todoIds.split(',');
+      newTodoIds.splice(todo.index, 0, String(todoId));
+
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: todo.status,
+          },
+        },
+        data: {
+          todoIds: newTodoIds.join(','),
+        },
+      });
+    } else {
       updateTodoOrders.todoIds = String(todoId);
       await this.prisma.todoOrder.update({
         where: {
@@ -231,22 +276,6 @@ export class TodoService {
         },
         data: {
           todoIds: updateTodoOrders.todoIds,
-        },
-      });
-    } else {
-      // 文字配列に変換し新たなインデックスへ追加
-      const currentNewTodoIds = updateTodoOrders.todoIds.split(',');
-      currentNewTodoIds.splice(todo.index, 0, String(todoId));
-
-      await this.prisma.todoOrder.update({
-        where: {
-          userId_status: {
-            userId,
-            status: todo.status,
-          },
-        },
-        data: {
-          todoIds: currentNewTodoIds.join(','),
         },
       });
     }
@@ -285,16 +314,30 @@ export class TodoService {
       (id) => id !== String(deletedTodo.id),
     );
 
-    await this.prisma.todoOrder.update({
-      where: {
-        userId_status: {
-          userId,
-          status: deletedTodo.status,
+    if (deletedTodoIds.length) {
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: deletedTodo.status,
+          },
         },
-      },
-      data: {
-        todoIds: deletedTodoIds.join(','),
-      },
-    });
+        data: {
+          todoIds: deletedTodoIds.join(','),
+        },
+      });
+    } else {
+      await this.prisma.todoOrder.update({
+        where: {
+          userId_status: {
+            userId,
+            status: deletedTodo.status,
+          },
+        },
+        data: {
+          todoIds: null,
+        },
+      });
+    }
   }
 }
