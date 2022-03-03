@@ -1,4 +1,3 @@
-import { UpdateTodoDto } from './dto/update-todo.dto';
 import {
   Body,
   Controller,
@@ -10,11 +9,12 @@ import {
   Put,
   Version,
 } from '@nestjs/common';
-import { TodoService } from './todo.service';
-import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
-import { CreateTodoDto } from './dto/create-todo.dto';
-import { FindAllRes } from './response/findAll.response.';
 import { Todo } from '@prisma/client';
+import { CreateTodoDto } from './dto/create-todo.dto';
+import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
+import { FindAllRes } from './response/findAll.response.';
+import { TodoService } from './todo.service';
 
 @Controller('todos')
 export class TodoController {
