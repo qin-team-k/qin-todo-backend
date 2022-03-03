@@ -233,7 +233,7 @@ export class TodoService {
     }
 
     // Todoを更新
-    const updatedTodo = await this.prisma.todo.update({
+    await this.prisma.todo.update({
       where: { id: todoId },
       data: { status: todo.status },
     });
