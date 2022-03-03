@@ -27,9 +27,27 @@ export class TodoService {
       (todoOrder) => todoOrder.status === 'NEXT',
     );
 
-    const todayTodoIds = todayTodoOrder[0].todoIds.split(',');
-    const tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
-    const nextTodoIds = nextTodoOrder[0].todoIds.split(',');
+    let todayTodoIds: string[];
+    let tomorrowTodoIds: string[];
+    let nextTodoIds: string[];
+
+    if (todayTodoOrder[0].todoIds) {
+      todayTodoIds = todayTodoOrder[0].todoIds.split(',');
+    } else {
+      todayTodoIds = [];
+    }
+
+    if (tomorrowTodoOrder[0].todoIds) {
+      tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
+    } else {
+      tomorrowTodoIds = [];
+    }
+
+    if (nextTodoOrder[0].todoIds) {
+      nextTodoIds = nextTodoOrder[0].todoIds.split(',');
+    } else {
+      nextTodoIds = [];
+    }
 
     const todos = await this.prisma.todo.findMany({
       where: {
