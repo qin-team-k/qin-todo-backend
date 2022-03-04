@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { Todo, TodoStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
 import { FindAllRes } from './response/findAll.response.';
-import { Todo, TodoStatus } from '@prisma/client';
 
 @Injectable()
 export class TodoService {
