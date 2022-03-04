@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Todo } from '@prisma/client';
+import { Todo, TodoStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
@@ -18,13 +18,13 @@ export class TodoService {
       },
     });
     const todayTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === 'TODAY',
+      (todoOrder) => todoOrder.status === TodoStatus.TODAY,
     );
     const tomorrowTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === 'TOMORROW',
+      (todoOrder) => todoOrder.status === TodoStatus.TOMORROW,
     );
     const nextTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === 'NEXT',
+      (todoOrder) => todoOrder.status === TodoStatus.NEXT,
     );
 
     let todayTodoIds: string[];
@@ -77,9 +77,9 @@ export class TodoService {
   async create(userId: string, todo: CreateTodoDto): Promise<Todo> {
     const createdTodo = await this.prisma.todo.create({
       data: {
-        content: todo.content,
         userId,
         status: todo.status,
+        content: todo.content,
       },
     });
 
@@ -131,25 +131,29 @@ export class TodoService {
     });
     const duplicatedTodo = await this.prisma.todo.create({
       data: {
-        content: todo.content,
         userId,
         status: todo.status,
+        content: todo.content,
       },
     });
 
-    const todoOrders = await this.prisma.todoOrder.findMany({
+    const todoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId: todo.userId,
-        status: todo.status,
+        userId_status: {
+          userId,
+          status: todo.status,
+        },
       },
     });
-    const currentTodoIds = todoOrders[0].todoIds.split(',');
+    const currentTodoIds = todoOrders.todoIds.split(',');
     const todoIdIndex = currentTodoIds.indexOf(String(todo.id));
     currentTodoIds.splice(todoIdIndex + 1, 0, String(duplicatedTodo.id));
-    await this.prisma.todoOrder.updateMany({
+    await this.prisma.todoOrder.update({
       where: {
-        userId: todo.userId,
-        status: todo.status,
+        userId_status: {
+          userId,
+          status: todo.status,
+        },
       },
       data: {
         todoIds: currentTodoIds.join(','),
@@ -229,7 +233,7 @@ export class TodoService {
     }
 
     // Todoを更新
-    const updatedTodo = await this.prisma.todo.update({
+    await this.prisma.todo.update({
       where: { id: todoId },
       data: { status: todo.status },
     });
