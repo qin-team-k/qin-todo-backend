@@ -1,9 +1,14 @@
-import { Controller, Get, Res, UseGuards, Version } from '@nestjs/common';
-import { Response } from 'express';
-import { GoogleAuthGuard } from 'src/common/guards/auth.guard';
+import { Controller, Get, Req, UseGuards, Version } from '@nestjs/common';
+import { User } from '@prisma/client';
+import {
+  AuthenticatedGuard,
+  GoogleAuthGuard,
+} from 'src/common/guards/auth.guard';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
   /**
    * GET /api/v1/auth/login
    * username passwordで登録する場合はPOSTだけどOAuthの場合は違う
@@ -24,8 +29,8 @@ export class AuthController {
   @Version('1')
   @Get('callback')
   @UseGuards(GoogleAuthGuard)
-  redirect(@Res() res: Response) {
-    res.send(200);
+  redirect(@Req() req): Promise<User> {
+    return this.authService.findUser(req.user);
   }
 
   /**
@@ -33,9 +38,10 @@ export class AuthController {
    * ユーザーがログインしてるかどうかチェック response 200 or 401
    */
   @Version('1')
+  @UseGuards(AuthenticatedGuard)
   @Get('status')
   status() {
-    return 'redirect';
+    return 'ok';
   }
 
   /**
