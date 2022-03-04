@@ -1,5 +1,4 @@
-import { Controller, Get, Req, UseGuards, Version } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
 import {
   AuthenticatedGuard,
   GoogleAuthGuard,
@@ -29,8 +28,8 @@ export class AuthController {
   @Version('1')
   @Get('callback')
   @UseGuards(GoogleAuthGuard)
-  redirect(@Req() req): Promise<User> {
-    return this.authService.findUser(req.user);
+  redirect(@Res() res) {
+    res.redirect('http://localhost:3000/api/v1/todos');
   }
 
   /**
@@ -50,7 +49,9 @@ export class AuthController {
    */
   @Version('1')
   @Get('logout')
-  logout() {
-    return 'logout';
+  logout(@Req() req, @Res() res) {
+    console.log(req.session);
+
+    res.redirect('http://localhost:3000/api/v1/todos');
   }
 }
