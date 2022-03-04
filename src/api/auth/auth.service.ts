@@ -31,7 +31,7 @@ export class AuthService {
   async findUser(
     googleUserDetails: GoogleUserDetails,
   ): Promise<User | undefined> {
-    return this.prisma.user.findUnique({
+    return await this.prisma.user.findUnique({
       where: { email: googleUserDetails.email },
     });
   }
