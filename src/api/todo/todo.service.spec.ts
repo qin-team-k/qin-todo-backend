@@ -1,4 +1,3 @@
-import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TodoStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
