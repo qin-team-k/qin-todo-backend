@@ -13,9 +13,6 @@ beforeEach(async () => {
   service = module.get<TodoService>(TodoService);
 });
 
-beforeAll(() => {
-  global.Date.now = jest.fn(() => 1595980800000);
-});
 const userId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
 
 const todoAll = {
