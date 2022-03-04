@@ -25,6 +25,13 @@ export class AuthService {
         avatarUrl: googleUserDetails.avatarUrl,
       },
     });
+    await this.prisma.todoOrder.createMany({
+      data: [
+        { userId: user.id, status: 'TODAY' },
+        { userId: user.id, status: 'TOMORROW' },
+        { userId: user.id, status: 'NEXT' },
+      ],
+    });
     return user;
   }
 

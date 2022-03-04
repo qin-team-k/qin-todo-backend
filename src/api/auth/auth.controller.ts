@@ -1,13 +1,18 @@
-import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Res,
+  Session,
+  UseGuards,
+  Version,
+} from '@nestjs/common';
 import {
   AuthenticatedGuard,
   GoogleAuthGuard,
 } from 'src/common/guards/auth.guard';
-import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
   /**
    * GET /api/v1/auth/login
    * username passwordで登録する場合はPOSTだけどOAuthの場合は違う
@@ -19,7 +24,7 @@ export class AuthController {
   @Get('login')
   @UseGuards(GoogleAuthGuard)
   login() {
-    return 'login';
+    return;
   }
   /**
    * GET /api/v1/auth/callback
@@ -28,17 +33,17 @@ export class AuthController {
   @Version('1')
   @Get('callback')
   @UseGuards(GoogleAuthGuard)
-  redirect(@Res() res) {
-    res.redirect('http://localhost:3000/api/v1/todos');
+  redirect(@Session() session, @Res() res) {
+    res.redirect('http://localhost:8080');
   }
 
   /**
    * GET /api/v1/auth/status
-   * ユーザーがログインしてるかどうかチェック response 200 or 401
+   * ユーザーがログインしてるかどうかチェック response 200 or 403
    */
   @Version('1')
-  @UseGuards(AuthenticatedGuard)
   @Get('status')
+  @UseGuards(AuthenticatedGuard)
   status() {
     return 'ok';
   }
@@ -49,9 +54,10 @@ export class AuthController {
    */
   @Version('1')
   @Get('logout')
-  logout(@Req() req, @Res() res) {
-    console.log(req.session);
-
-    res.redirect('http://localhost:3000/api/v1/todos');
+  @UseGuards(AuthenticatedGuard)
+  logout(@Session() session, @Res() res) {
+    session.destroy(() => {
+      res.redirect('http://localhost:8080/login');
+    });
   }
 }

@@ -92,7 +92,7 @@ export class TodoService {
       },
     });
 
-    if (todoOrders.todoIds === '') {
+    if (todoOrders.todoIds === null) {
       await this.prisma.todoOrder.update({
         where: {
           userId_status: {
