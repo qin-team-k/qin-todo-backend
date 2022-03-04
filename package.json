@@ -16,13 +16,14 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "docker:up": "docker-compose -f ./docker/docker-compose.yml -p qin-todo up -d",
-    "migrate": "yarn prisma db push && npx ts-node prisma/seed/start.ts",
     "docker:down": "docker-compose -f ./docker/docker-compose.yml -p qin-todo down",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "docker:reset": "yarn docker:down && yarn docker:up",
+    "migrate": "yarn prisma db push && npx ts-node prisma/seed/start.ts",
+    "test": "yarn docker:reset && sleep 10 && yarn migrate && jest",
+    "test:watch": "yarn docker:reset && sleep 10 && yarn migrate && jest --watch",
+    "test:cov": "yarn docker:reset && sleep 10 && yarn migrate && jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "yarn docker:reset && sleep 10 && yarn migrate && jest --config ./test/jest-e2e.json"
   },
   "prisma": {
     "seed": "ts-node prisma/seed/start.ts"
