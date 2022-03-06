@@ -10,12 +10,13 @@ import { AuthGuard } from '@nestjs/passport';
 export class GoogleAuthGuard extends AuthGuard('google') {
   async canActivate(context: ExecutionContext): Promise<any> {
     const activate = (await super.canActivate(context)) as boolean;
-    // console.log({ activate });
 
-    const request = context.switchToHttp().getRequest();
-    // console.log({ request });
+    /**
+     * コンテキストをHTTPに切り替えてrequestを取得
+     */
+    const req = context.switchToHttp().getRequest();
 
-    await super.logIn(request);
+    await super.logIn(req);
     return activate;
   }
 }
