@@ -3,8 +3,10 @@ import { AuthGuard } from '@nestjs/passport';
 
 /**
  * 認証後に訪れて良いページにガードを設定する
- * セッションを設定する必要がある。
- * パスポートも初期化しなければいけない。
+ * superクラスはGoogleStrategyを呼び出すためのFWを提供してくれる
+ * この時パスポートはGoogleStrategyを実行しユーザー認証されたかどうかをbooleanで返す
+ * !!!重要!!!: セッションを開始するためにsuperクラスのloginメソッドにリクエストを渡す!!!
+ * これでexpressセッションが設定された
  */
 
 @Injectable()

@@ -7,7 +7,11 @@ import { AuthService } from 'src/api/auth/auth.service';
  * この関数は基本的に内部で呼び出され処理される。
  * AuthModuleのprovidersに登録するだけでOK!!
  * superはPassportStrategy内のconstructorを実行するために必要。
- * どうやってこれを呼び出すのか? AuthGardを利用する。
+ * PassportStrategyはvalidateメソッドを持っている
+ * Passportは...
+ * 1. 認証のステップ（ログインなど）を実行する必要がある
+ * 2. その後ユーザーの資格情報を確認する必要がある(ユーザーのセッションが有効かどうか)
+ * どうやってこれを呼び出すのか? AuthGardにあるloginメソッドを利用する
  */
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
