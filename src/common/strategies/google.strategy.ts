@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { AuthService } from 'src/api/auth/auth.service';
@@ -47,6 +47,9 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
     const user = await this.authService.validateUser(googleUserDetails);
 
+    if (!user) {
+      throw new UnauthorizedException();
+    }
     // nullは成功の意味、userをrequestへ渡す(request.user)
     done(null, user);
   }
