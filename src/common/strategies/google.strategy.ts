@@ -5,6 +5,8 @@ import { AuthService } from 'src/api/auth/auth.service';
 
 /**
  * この関数は基本的に内部で呼び出され処理される。
+ * AuthModuleのprovidersに登録するだけでOK!!
+ * superはPassportStrategy内のconstructorを実行するために必要。
  * どうやってこれを呼び出すのか? AuthGardを利用する。
  */
 @Injectable()
@@ -18,6 +20,11 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  /**
+   * 絶対にないとダメ！
+   * もしないとUseGuard()使ったときに「ないですよ」と怒られる
+   * validateの括弧内はgoogleが返してくれるユーザー情報
+   */
   async validate(
     accessToken: string,
     refreshToken: string,
@@ -36,6 +43,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
 
     const user = await this.authService.validateUser(googleUserDetails);
 
+    // nullは成功の意味、userをrequestへ渡す(request.user)
     done(null, user);
   }
 }

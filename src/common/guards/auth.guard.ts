@@ -6,7 +6,9 @@ import { AuthGuard } from '@nestjs/passport';
  * セッションを設定する必要がある。
  * パスポートも初期化しなければいけない。
  */
+
 @Injectable()
+// "google"を渡すことで簡単にstrategyを変更してくれる
 export class GoogleAuthGuard extends AuthGuard('google') {
   async canActivate(context: ExecutionContext): Promise<any> {
     const activate = (await super.canActivate(context)) as boolean;
