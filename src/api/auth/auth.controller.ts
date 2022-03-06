@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Req,
   Res,
   Session,
   UseGuards,
@@ -33,19 +34,19 @@ export class AuthController {
   @Version('1')
   @Get('callback')
   @UseGuards(GoogleAuthGuard)
-  redirect(@Session() session, @Res() res) {
+  redirect(@Res() res) {
     res.redirect('http://localhost:8080');
   }
 
   /**
-   * GET /api/v1/auth/status
-   * ユーザーがログインしてるかどうかチェック response 200 or 403
+   * GET /api/v1/auth/profile
+   * ユーザー情報を返す
    */
   @Version('1')
-  @Get('status')
+  @Get('profile')
   @UseGuards(AuthenticatedGuard)
-  status() {
-    return 'ok';
+  status(@Req() req) {
+    return { ...req.user };
   }
 
   /**
