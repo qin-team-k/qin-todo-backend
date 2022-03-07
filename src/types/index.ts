@@ -3,6 +3,4 @@ export type GoogleUserDetails = {
   email: string;
   username: string;
   avatarUrl: string;
-  provider: string;
-  accessToken: string;
 };
