@@ -15,6 +15,6 @@ export type JwtPayload = {
   username: string;
   email: string;
   avatarUrl: string;
-  // iat: 1646635782;
-  // exp: 1646636682;
+  iat?: 1646635782;
+  exp?: 1646636682;
 };
