@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
+import { JwtPayload } from 'src/types';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -14,19 +15,14 @@ export class AccessTokenStrategy extends PassportStrategy(
       // 有効期間を無視するかどうか
       ignoreExpiration: false,
       // envファイルから秘密鍵を渡す
-      secretOrKey: process.env.ACCESS_TOKEN_SECRET,
+      secretOrKey: process.env.TOKEN_SECRET,
       passReqToCallback: true,
     });
   }
 
   // ここでPayloadを使ったバリデーション処理を実行できる
   // Payloadは、AuthService.login()で定義した値
-  async validate(payload) {
-    //FIXME payload.userがなぜか取れない...
-    console.log(payload.user);
-
-    const accessToken = payload.rawHeaders[1].split(' ')[1];
-
+  async validate(_request, payload: JwtPayload): Promise<JwtPayload> {
     return payload;
   }
 }

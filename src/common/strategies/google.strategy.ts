@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { AuthService } from 'src/api/auth/auth.service';
@@ -14,7 +14,7 @@ import { AuthService } from 'src/api/auth/auth.service';
  * どうやってこれを呼び出すのか? AuthGardにあるloginメソッドを利用する
  */
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy) {
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private authService: AuthService) {
     super({
       clientID: process.env.GOOGLE_CLIENT_ID,
@@ -35,19 +35,16 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     profile: Profile,
     done: VerifyCallback,
   ): Promise<any> {
-    const { id, emails, photos, _json, provider } = profile;
+    const { id, emails, photos } = profile;
     const googleUserDetails = {
       id,
       email: emails[0].value,
-      username: _json.name,
+      username: profile.displayName,
       avatarUrl: photos[0].value,
     };
 
-    const user = await this.authService.validateUser(googleUserDetails);
-
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    await this.authService.validateUser(googleUserDetails);
+    const user = await this.authService.findUser(googleUserDetails);
     // nullは成功の意味、userをrequestへ渡す(request.user)
     done(null, user);
   }

@@ -1,6 +1,7 @@
 import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetCurrentUser } from 'src/common/decorators';
+import { GetCurrentUser, GetCurrentUserId } from 'src/common/decorators';
+import { RefreshTokenGuard } from 'src/common/guards';
 import { AuthenticatedGuard } from 'src/common/guards/auth.guard';
 import { Tokens } from 'src/types';
 import { AccessTokenGuard } from './../../common/guards/access-token.guard';
@@ -53,10 +54,8 @@ export class AuthController {
   @Version('1')
   @Get('logout')
   @UseGuards(AccessTokenGuard)
-  logout(@GetCurrentUser('sub') userId: string) {
-    // this.authService.logout('06e8048e-5923-4fd9-a289-a5e0a0d2ef79');
-
-    return 'logout';
+  logout(@GetCurrentUserId() userId: string) {
+    return this.authService.logout(userId);
   }
 
   /**
@@ -65,10 +64,11 @@ export class AuthController {
    */
   @Version('1')
   @Get('refresh')
-  @UseGuards(AuthGuard('jwt-refresh'))
-  refreshTokens(@Req() req) {
-    return 'refresh route';
-
-    // this.authService.refreshToken("'06e8048e-5923-4fd9-a289-a5e0a0d2ef79'");
+  @UseGuards(RefreshTokenGuard)
+  refreshTokens(
+    @GetCurrentUser('refreshToken') refreshToken: string,
+    @GetCurrentUserId() userId: string,
+  ) {
+    return this.authService.refreshToken(userId, refreshToken);
   }
 }

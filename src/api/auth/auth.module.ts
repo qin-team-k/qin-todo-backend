@@ -9,17 +9,9 @@ import { GoogleStrategy } from 'src/common/strategies/google.strategy';
 import { PrismaService } from 'src/prisma.service';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { SessionSerializer } from './session.serializer';
 
 @Module({
-  imports: [
-    PassportModule.register({
-      defaultStrategy: 'jwt',
-      property: 'user',
-      session: false,
-    }),
-    JwtModule.register({}),
-  ],
+  imports: [PassportModule, JwtModule.register({})],
   controllers: [AuthController],
   providers: [
     GoogleStrategy,
@@ -27,7 +19,6 @@ import { SessionSerializer } from './session.serializer';
     RefreshTokenStrategy,
     AuthService,
     PrismaService,
-    SessionSerializer,
   ],
 })
 export class AuthModule {}

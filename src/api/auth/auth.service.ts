@@ -64,6 +64,8 @@ export class AuthService {
     );
     if (!IsRefreshTokenMatches) throw new ForbiddenException('Access denied');
     const tokens = await this.getTokens(user);
+    console.log(tokens);
+
     await this.updateDBRefreshToken(user.id, tokens.refresh_token);
     return tokens;
   }
@@ -99,13 +101,13 @@ export class AuthService {
     const [access_token, refresh_token] = await Promise.all([
       //access token
       this.jwtService.signAsync(jwtPayload, {
-        secret: process.env.ACCESS_TOKEN_SECRET,
+        secret: process.env.TOKEN_SECRET,
         expiresIn: '15m',
       }),
 
       //refresh token
       this.jwtService.signAsync(jwtPayload, {
-        secret: process.env.REFRESH_TOKEN_SECRET,
+        secret: process.env.TOKEN_SECRET,
         expiresIn: '7d',
       }),
     ]);
