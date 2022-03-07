@@ -1,14 +1,9 @@
-import {
-  Controller,
-  Get,
-  Req,
-  Res,
-  Session,
-  UseGuards,
-  Version,
-} from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { GetCurrentUser } from 'src/common/decorators';
 import { AuthenticatedGuard } from 'src/common/guards/auth.guard';
+import { Tokens } from 'src/types';
+import { AccessTokenGuard } from './../../common/guards/access-token.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -36,10 +31,8 @@ export class AuthController {
   @Get('callback')
   // @UseGuards(GoogleAuthGuard)
   @UseGuards(AuthGuard('google'))
-  redirect(@Req() req) {
-    console.log({ user: req.user });
-
-    return this.authService.signin(req.user);
+  async redirect(@Res() res): Promise<Tokens> {
+    return res.redirect('http://localhost:8080');
   }
 
   /**
@@ -59,10 +52,23 @@ export class AuthController {
    */
   @Version('1')
   @Get('logout')
-  @UseGuards(AuthenticatedGuard)
-  logout(@Session() session, @Res() res) {
-    session.destroy(() => {
-      res.redirect('http://localhost:8080/login');
-    });
+  @UseGuards(AccessTokenGuard)
+  logout(@GetCurrentUser('sub') userId: string) {
+    // this.authService.logout('06e8048e-5923-4fd9-a289-a5e0a0d2ef79');
+
+    return 'logout';
+  }
+
+  /**
+   * GET /api/v1/auth/refresh
+   * リフレッシュトークン
+   */
+  @Version('1')
+  @Get('refresh')
+  @UseGuards(AuthGuard('jwt-refresh'))
+  refreshTokens(@Req() req) {
+    return 'refresh route';
+
+    // this.authService.refreshToken("'06e8048e-5923-4fd9-a289-a5e0a0d2ef79'");
   }
 }
