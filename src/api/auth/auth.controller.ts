@@ -7,13 +7,13 @@ import {
   UseGuards,
   Version,
 } from '@nestjs/common';
-import {
-  AuthenticatedGuard,
-  GoogleAuthGuard,
-} from 'src/common/guards/auth.guard';
+import { AuthGuard } from '@nestjs/passport';
+import { AuthenticatedGuard } from 'src/common/guards/auth.guard';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
+  constructor(private authService: AuthService) {}
   /**
    * GET /api/v1/auth/login
    * username passwordで登録する場合はPOSTだけどOAuthの場合は違う
@@ -23,7 +23,8 @@ export class AuthController {
    */
   @Version('1')
   @Get('login')
-  @UseGuards(GoogleAuthGuard)
+  // @UseGuards(GoogleAuthGuard)
+  @UseGuards(AuthGuard('google'))
   login() {
     return;
   }
@@ -33,9 +34,12 @@ export class AuthController {
    */
   @Version('1')
   @Get('callback')
-  @UseGuards(GoogleAuthGuard)
-  redirect(@Res() res) {
-    res.redirect('http://localhost:8080');
+  // @UseGuards(GoogleAuthGuard)
+  @UseGuards(AuthGuard('google'))
+  redirect(@Req() req) {
+    console.log({ user: req.user });
+
+    return this.authService.signin(req.user);
   }
 
   /**
