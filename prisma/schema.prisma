@@ -8,14 +8,15 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  username   String      @map("username") @db.VarChar(100)
-  email      String      @unique @db.VarChar(191)
-  avatarUrl  String      @map("avatar_url") @db.VarChar(255)
-  createdAt  DateTime    @default(now()) @map("created_at")
-  updatedAt  DateTime    @default(now()) @updatedAt @map("updated_at")
-  todos      Todo[]
-  todoStatus TodoOrder[]
+  id           String      @id @default(uuid())
+  username     String      @map("username") @db.VarChar(100)
+  email        String      @unique @db.VarChar(191)
+  avatarUrl    String      @map("avatar_url") @db.VarChar(255)
+  refreshToken String?     @map("refresh_token") @db.VarChar(191)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at")
+  todos        Todo[]
+  todoStatus   TodoOrder[]
 
   @@map("user")
 }
