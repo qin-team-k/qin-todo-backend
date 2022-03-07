@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
+import { SessionSerializer } from 'src/common/serializer/session.serializer';
 import { GoogleStrategy } from 'src/common/strategies/google.strategy';
 import { PrismaService } from 'src/prisma.service';
-import { SessionSerializer } from '../../common/serializer/session.serializer';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 

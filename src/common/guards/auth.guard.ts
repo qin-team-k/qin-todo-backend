@@ -1,0 +1,38 @@
+import { Injectable, ExecutionContext, CanActivate } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+
+/**
+ * 認証後に訪れて良いページにガードを設定する
+ * superクラスはGoogleStrategyを呼び出すためのFWを提供してくれる
+ * この時パスポートはGoogleStrategyを実行しユーザー認証されたかどうかをbooleanで返す
+ * !!!重要!!!: セッションを開始するためにsuperクラスのloginメソッドにリクエストを渡す!!!
+ * これでexpressセッションが設定された
+ */
+
+@Injectable()
+// "google"を渡すことで簡単にstrategyを変更してくれる
+export class GoogleAuthGuard extends AuthGuard('google') {
+  async canActivate(context: ExecutionContext): Promise<any> {
+    const activate = (await super.canActivate(context)) as boolean;
+
+    /**
+     * コンテキストをHTTPに切り替えてrequestを取得
+     */
+    const req = context.switchToHttp().getRequest();
+
+    await super.logIn(req);
+    return activate;
+  }
+}
+
+/**
+ * 認証してるかどうか
+ *
+ */
+@Injectable()
+export class AuthenticatedGuard implements CanActivate {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest();
+    return req.isAuthenticated();
+  }
+}
