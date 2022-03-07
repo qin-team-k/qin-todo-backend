@@ -1,5 +1,6 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import * as passport from 'passport';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -22,6 +23,8 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
+  app.use(passport.initialize());
 
   const port = Number(process.env.PORT) || 3000;
   await app.listen(port, '0.0.0.0');
