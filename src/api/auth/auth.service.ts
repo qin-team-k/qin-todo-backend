@@ -70,11 +70,9 @@ export class AuthService {
     return tokens;
   }
 
-  async findUser(
-    googleUserDetails: GoogleUserDetails,
-  ): Promise<User | undefined> {
+  async findUser(email: string): Promise<User | undefined> {
     return await this.prisma.user.findUnique({
-      where: { email: googleUserDetails.email },
+      where: { email },
     });
   }
 

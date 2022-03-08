@@ -44,7 +44,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     };
 
     await this.authService.validateUser(googleUserDetails);
-    const user = await this.authService.findUser(googleUserDetails);
+    const user = await this.authService.findUser(googleUserDetails.email);
     // nullは成功の意味、userをrequestへ渡す(request.user)
     done(null, user);
   }
