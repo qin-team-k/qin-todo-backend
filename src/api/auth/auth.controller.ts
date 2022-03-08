@@ -1,4 +1,4 @@
-import { Controller, Get, Req, UseGuards, Version } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import {
   GetCurrentUser,
@@ -34,9 +34,20 @@ export class AuthController {
   @Get('callback')
   @Public()
   @UseGuards(AuthGuard('google'))
-  async redirect(@Req() req) {
-    return this.authService.issueTokens(req.user.id);
-    // return this.authService.findUser(userId);
+  async redirect(@Req() req, @Res({ passthrough: true }) res) {
+    const tokens = await this.authService.issueTokens(req.user.id);
+    console.log(tokens);
+
+    res.cookie('quin-todo-access-token', tokens.access_token, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'strict',
+    });
+    res.cookie('quin-todo-refresh-token', tokens.refresh_token, {
+      maxAge: 60000,
+      httpOnly: true,
+    });
+    return { msg: 'success' };
   }
 
   /**
@@ -67,10 +78,24 @@ export class AuthController {
   @Version('1')
   @Get('refresh')
   @UseGuards(RefreshTokenGuard)
-  refreshTokens(
+  async refreshTokens(
     @GetCurrentUser('refreshToken') refreshToken: string,
     @GetCurrentUserId() userId: string,
+    @Res({ passthrough: true }) res,
   ) {
-    return this.authService.refreshToken(userId, refreshToken);
+    const refreshedTokens = await this.authService.refreshToken(
+      userId,
+      refreshToken,
+    );
+
+    res.cookie('quin-todo-access-token', refreshedTokens.access_token, {
+      maxAge: 60000,
+      httpOnly: true,
+    });
+    res.cookie('quin-todo-refresh-token', refreshedTokens.refresh_token, {
+      maxAge: 60000,
+      httpOnly: true,
+    });
+    return { msg: 'success' };
   }
 }
