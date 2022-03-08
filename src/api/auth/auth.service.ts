@@ -57,7 +57,8 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-    if (!user) throw new ForbiddenException('Access denied');
+    if (!user || !user.refreshToken)
+      throw new ForbiddenException('Access denied');
     const IsRefreshTokenMatches = await bcrypt.compare(
       refreshToken,
       user.refreshToken,
