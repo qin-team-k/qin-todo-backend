@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
+import argon2 from 'argon2';
 import { PrismaService } from 'src/prisma.service';
 import { GoogleUserDetails, JwtPayload, Tokens } from 'src/types';
 
@@ -59,7 +59,7 @@ export class AuthService {
     });
     if (!user || !user.refreshToken)
       throw new ForbiddenException('Access denied');
-    const IsRefreshTokenMatches = await bcrypt.compare(
+    const IsRefreshTokenMatches = await argon2.verify(
       refreshToken,
       user.refreshToken,
     );
@@ -78,7 +78,7 @@ export class AuthService {
   }
 
   async updateDBRefreshToken(userId: string, refreshToken: string) {
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const hashedRefreshToken = await argon2.hash(refreshToken);
 
     await this.prisma.user.update({
       where: { id: userId },
