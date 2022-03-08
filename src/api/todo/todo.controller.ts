@@ -7,11 +7,9 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  UseGuards,
   Version,
 } from '@nestjs/common';
 import { Todo } from '@prisma/client';
-import { AccessTokenGuard } from 'src/common/guards';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -19,7 +17,6 @@ import { FindAllRes } from './response/findAll.response.';
 import { TodoService } from './todo.service';
 
 @Controller('todos')
-@UseGuards(AccessTokenGuard)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 

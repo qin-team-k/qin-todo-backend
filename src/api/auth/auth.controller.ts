@@ -1,6 +1,10 @@
 import { Controller, Get, Res, UseGuards, Version } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { GetCurrentUser, GetCurrentUserId } from 'src/common/decorators';
+import {
+  GetCurrentUser,
+  GetCurrentUserId,
+  Public,
+} from 'src/common/decorators';
 import { RefreshTokenGuard } from 'src/common/guards';
 import { JwtPayload, Tokens } from 'src/types';
 import { AccessTokenGuard } from './../../common/guards/access-token.guard';
@@ -29,6 +33,7 @@ export class AuthController {
   @Version('1')
   @Get('callback')
   @Get('login')
+  @Public()
   @UseGuards(AuthGuard('google'))
   async redirect(@Res() res): Promise<Tokens> {
     return res.redirect('http://localhost:8080');
@@ -59,6 +64,7 @@ export class AuthController {
   /**
    * GET /api/v1/auth/refresh
    * リフレッシュトークン
+   * クッキーに「/refresh」パスを追加して、「/refresh」エンドポイントへのリクエストにのみクッキーが送信されるようにする必要がある
    */
   @Version('1')
   @Get('refresh')
