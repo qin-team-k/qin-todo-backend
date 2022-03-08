@@ -64,7 +64,7 @@ export class AuthController {
   /**
    * GET /api/v1/auth/refresh
    * リフレッシュトークン
-   * クッキーに「/refresh」パスを追加して、「/refresh」エンドポイントへのリクエストにのみクッキーが送信されるようにする必要がある
+   * クッキーに「/refresh」パスを追加して、ここへのリクエストだけにクッキーが送信されるようにする必要がある
    */
   @Version('1')
   @Get('refresh')
