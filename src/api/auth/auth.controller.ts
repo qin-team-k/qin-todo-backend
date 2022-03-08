@@ -1,9 +1,8 @@
-import { Controller, Get, Req, Res, UseGuards, Version } from '@nestjs/common';
+import { Controller, Get, Res, UseGuards, Version } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { GetCurrentUser, GetCurrentUserId } from 'src/common/decorators';
 import { RefreshTokenGuard } from 'src/common/guards';
-import { AuthenticatedGuard } from 'src/common/guards/auth.guard';
-import { Tokens } from 'src/types';
+import { JwtPayload, Tokens } from 'src/types';
 import { AccessTokenGuard } from './../../common/guards/access-token.guard';
 import { AuthService } from './auth.service';
 
@@ -19,7 +18,6 @@ export class AuthController {
    */
   @Version('1')
   @Get('login')
-  // @UseGuards(GoogleAuthGuard)
   @UseGuards(AuthGuard('google'))
   login() {
     return;
@@ -30,7 +28,7 @@ export class AuthController {
    */
   @Version('1')
   @Get('callback')
-  // @UseGuards(GoogleAuthGuard)
+  @Get('login')
   @UseGuards(AuthGuard('google'))
   async redirect(@Res() res): Promise<Tokens> {
     return res.redirect('http://localhost:8080');
@@ -42,9 +40,9 @@ export class AuthController {
    */
   @Version('1')
   @Get('profile')
-  @UseGuards(AuthenticatedGuard)
-  status(@Req() req) {
-    return { ...req.user };
+  @UseGuards(AccessTokenGuard)
+  status(@GetCurrentUser() user: JwtPayload) {
+    return this.authService.findUser(user.email);
   }
 
   /**
