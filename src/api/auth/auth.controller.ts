@@ -22,6 +22,7 @@ export class AuthController {
    */
   @Version('1')
   @Get('login')
+  @Public()
   @UseGuards(AuthGuard('google'))
   login() {
     return;
