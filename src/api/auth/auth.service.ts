@@ -9,24 +9,19 @@ import { GoogleUserDetails, JwtPayload, Tokens } from 'src/types';
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async validateUser(googleUserDetails: GoogleUserDetails): Promise<Tokens> {
+  async validateUser(googleUserDetails: GoogleUserDetails): Promise<User> {
     const { email } = googleUserDetails;
 
     const user = await this.prisma.user.findUnique({
       where: { email },
     });
 
-    if (user) {
-      const tokens = await this.getTokens(user);
-      console.log(tokens);
-      await this.updateDBRefreshToken(user.id, tokens.refresh_token);
-      return tokens;
-    }
+    if (user) return user;
 
     return await this.createUser(googleUserDetails);
   }
 
-  async createUser(googleUserDetails: GoogleUserDetails): Promise<Tokens> {
+  async createUser(googleUserDetails: GoogleUserDetails): Promise<User> {
     const user = await this.prisma.user.create({
       data: {
         username: googleUserDetails.username,
@@ -41,9 +36,7 @@ export class AuthService {
         { userId: user.id, status: 'NEXT' },
       ],
     });
-    const tokens = await this.getTokens(user);
-    await this.updateDBRefreshToken(user.id, tokens.refresh_token);
-    return tokens;
+    return user;
   }
 
   async logout(userId: string) {
@@ -51,6 +44,16 @@ export class AuthService {
       where: { id: userId },
       data: { refreshToken: null },
     });
+  }
+
+  async issueTokens(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) throw new ForbiddenException('Access denied');
+    const tokens = await this.getTokens(user);
+    await this.updateDBRefreshToken(user.id, tokens.refresh_token);
+    return tokens;
   }
 
   async refreshToken(userId: string, refreshToken: string) {
