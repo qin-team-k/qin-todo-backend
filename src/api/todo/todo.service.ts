@@ -72,6 +72,12 @@ export class TodoService {
     };
   }
 
+  async findById(todoId: number): Promise<Todo> {
+    return await this.prisma.todo.findUnique({
+      where: { id: todoId },
+    });
+  }
+
   // Todo作成
   // FIXME トランザクションを追加
   async create(userId: string, todo: CreateTodoDto): Promise<Todo> {

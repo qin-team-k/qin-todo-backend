@@ -26,19 +26,19 @@ export const todoOrder = async () => {
         id: 4,
         userId: '62ac362a-cd60-45b1-9100-3b469eceb31d',
         status: 'TODAY',
-        todoIds: null,
+        todoIds: '13',
       },
       {
         id: 5,
         userId: '62ac362a-cd60-45b1-9100-3b469eceb31d',
         status: 'TOMORROW',
-        todoIds: null,
+        todoIds: '14',
       },
       {
         id: 6,
         userId: '62ac362a-cd60-45b1-9100-3b469eceb31d',
         status: 'NEXT',
-        todoIds: null,
+        todoIds: '15',
       },
       {
         id: 7,

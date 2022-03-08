@@ -88,6 +88,33 @@ export const todo = async () => {
         done: false,
         content: 'ランニング',
       },
+      {
+        id: 13,
+        userId: '62ac362a-cd60-45b1-9100-3b469eceb31d',
+        status: 'TODAY',
+        done: false,
+        content: 'ランニング',
+        createdAt: '2020-06-01T00:00:00.000Z',
+        updatedAt: '2020-06-01T00:00:00.000Z',
+      },
+      {
+        id: 14,
+        userId: '62ac362a-cd60-45b1-9100-3b469eceb31d',
+        status: 'TOMORROW',
+        done: false,
+        content: 'プログラミング学習',
+        createdAt: '2020-06-01T00:00:00.000Z',
+        updatedAt: '2020-06-01T00:00:00.000Z',
+      },
+      {
+        id: 15,
+        userId: '62ac362a-cd60-45b1-9100-3b469eceb31d',
+        status: 'NEXT',
+        done: false,
+        content: 'テスト勉強',
+        createdAt: '2020-06-01T00:00:00.000Z',
+        updatedAt: '2020-06-01T00:00:00.000Z',
+      },
     ],
   });
 };
