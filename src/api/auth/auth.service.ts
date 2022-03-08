@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import argon2 from 'argon2';
+import * as argon2 from 'argon2';
 import { PrismaService } from 'src/prisma.service';
 import { GoogleUserDetails, JwtPayload, Tokens } from 'src/types';
 
