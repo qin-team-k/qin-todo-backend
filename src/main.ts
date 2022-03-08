@@ -19,7 +19,8 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: '*',
+    origin: true,
+    credentials: true,
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
   });
 
