@@ -32,18 +32,6 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
-  // app.enableCors({
-  //   origin: true,
-  //   credentials: true,
-  //   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-  // });
-
-  // CORS エラーをなくすため
-  // Request header field authorization is not allowed by Access-Control-Allow-Headers in preflight response.
-  // app.use((_req, res, _next) => {
-  //   res.setHeader('Access-Control-Allow-Origin', '*');
-  // });
-
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
