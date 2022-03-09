@@ -17,10 +17,10 @@ export class AuthInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Promise<Observable<any>> {
-    const ctx = context.switchToHttp();
-    const token = ctx.getRequest().headers['authorization'].split(' ')[1];
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers['authorization'].split(' ')[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
-    console.log(decodedToken);
+    request.uid = decodedToken.uid;
 
     return next.handle();
   }

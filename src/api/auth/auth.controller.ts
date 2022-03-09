@@ -1,4 +1,4 @@
-import { Controller, Get, UseInterceptors, Version } from '@nestjs/common';
+import { Controller, Get, Req, UseInterceptors, Version } from '@nestjs/common';
 import { AuthInterceptor } from 'src/common/interceptors/auth/auth.interceptor';
 import { AuthService } from './auth.service';
 
@@ -13,7 +13,7 @@ export class AuthController {
   @UseInterceptors(AuthInterceptor)
   @Version('1')
   @Get('profile')
-  profile() {
-    return 'profile';
+  profile(@Req() req) {
+    return req.uid;
   }
 }
