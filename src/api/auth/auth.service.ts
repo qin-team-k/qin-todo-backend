@@ -13,7 +13,17 @@ export class AuthService {
     });
 
     if (!user) {
-      const newUser = await this.prisma.user.create({
+      const newUser = await this.createNewUser(firebaseUser);
+      return newUser;
+    }
+
+    return user;
+  }
+
+  async createNewUser(firebaseUser: FirebaseUserType) {
+    // schema.prismaの generator に previewFeatures = ["interactiveTransactions"] を追加後 npx prisma generate し直す
+    return await this.prisma.$transaction(async (prisma): Promise<User> => {
+      const user = await prisma.user.create({
         data: {
           uid: firebaseUser.uid,
           username: firebaseUser.name,
@@ -21,9 +31,14 @@ export class AuthService {
           avatarUrl: firebaseUser.picture,
         },
       });
-      return newUser;
-    }
-
-    return user;
+      await prisma.todoOrder.createMany({
+        data: [
+          { userId: user.id, status: 'TODAY' },
+          { userId: user.id, status: 'TOMORROW' },
+          { userId: user.id, status: 'NEXT' },
+        ],
+      });
+      return user;
+    });
   }
 }
