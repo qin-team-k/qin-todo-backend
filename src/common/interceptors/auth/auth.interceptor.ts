@@ -33,11 +33,11 @@ export class AuthInterceptor implements NestInterceptor {
     };
 
     /**
-     * 必要な情報のみ返す()
+     * 必要な情報のみ返す(UserDto内の@Expose()のみ)
      */
 
     return next.handle().pipe(
-      map((data: any) => {
+      map((data: UserDto) => {
         return plainToInstance(UserDto, data, {
           excludeExtraneousValues: true,
         });
