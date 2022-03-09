@@ -1,4 +1,5 @@
-import { Controller, Get, Req, UseInterceptors, Version } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Version } from '@nestjs/common';
+import { GetCurrentUid } from 'src/common/decorators/auth.decorator';
 import { AuthInterceptor } from 'src/common/interceptors/auth/auth.interceptor';
 import { AuthService } from './auth.service';
 
@@ -13,7 +14,7 @@ export class AuthController {
   @UseInterceptors(AuthInterceptor)
   @Version('1')
   @Get('profile')
-  profile(@Req() req) {
-    return { id: '123', name: 'osamu' };
+  profile(@GetCurrentUid() uid: string) {
+    return { uid, name: 'osamu' };
   }
 }
