@@ -5,8 +5,10 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
+import { plainToInstance } from 'class-transformer';
 import * as admin from 'firebase-admin';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
+import { UserDto } from 'src/api/auth/dto/User.dto';
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
@@ -23,8 +25,23 @@ export class AuthInterceptor implements NestInterceptor {
     const decodedToken = await admin.auth().verifyIdToken(token);
     // FIX ME tokenが違っていた場合のエラーハンドリング。現在は500になる。
     if (!decodedToken) throw new ForbiddenException('Access denied');
-    request.uid = decodedToken.uid;
+    request.user = {
+      email: decodedToken.email,
+      name: decodedToken.name,
+      picture: decodedToken.picture,
+      uid: decodedToken.uid,
+    };
 
-    return next.handle();
+    /**
+     * 必要な情報のみ返す()
+     */
+
+    return next.handle().pipe(
+      map((data: any) => {
+        return plainToInstance(UserDto, data, {
+          excludeExtraneousValues: true,
+        });
+      }),
+    );
   }
 }
