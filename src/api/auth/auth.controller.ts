@@ -1,14 +1,9 @@
-import { Controller, Get, UseGuards, Version } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { AuthGuard } from '@nestjs/passport';
+import { Controller, Get, Version } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly jwtService: JwtService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   /**
    * GET /api/v1/auth/profile
@@ -16,7 +11,6 @@ export class AuthController {
    */
   @Version('1')
   @Get('profile')
-  @UseGuards(AuthGuard('jwt'))
   profile() {
     return 'profile';
   }
