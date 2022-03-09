@@ -1,6 +1,7 @@
 import { Controller, Get, UseInterceptors, Version } from '@nestjs/common';
-import { GetCurrentUid } from 'src/common/decorators/auth.decorator';
+import { GetCurrentUser } from 'src/common/decorators/auth.decorator';
 import { AuthInterceptor } from 'src/common/interceptors/auth/auth.interceptor';
+import { FirebaseUserType } from 'src/types';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -14,7 +15,7 @@ export class AuthController {
   @UseInterceptors(AuthInterceptor)
   @Version('1')
   @Get('profile')
-  profile(@GetCurrentUid() uid: string) {
-    return { uid, name: 'osamu' };
+  profile(@GetCurrentUser() user: FirebaseUserType) {
+    return this.authService.validateUser(user);
   }
 }
