@@ -12,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
+    { cors: true },
   );
 
   // 環境変数の値を指定してfirebase-admin用のConfigオブジェクトを作成
@@ -31,11 +32,17 @@ async function bootstrap() {
     type: VersioningType.URI,
   });
 
-  app.enableCors({
-    origin: true,
-    credentials: true,
-    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
-  });
+  // app.enableCors({
+  //   origin: true,
+  //   credentials: true,
+  //   allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept',
+  // });
+
+  // CORS エラーをなくすため
+  // Request header field authorization is not allowed by Access-Control-Allow-Headers in preflight response.
+  // app.use((_req, res, _next) => {
+  //   res.setHeader('Access-Control-Allow-Origin', '*');
+  // });
 
   app.useGlobalPipes(
     new ValidationPipe({
