@@ -3,13 +3,12 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import * as argon2 from 'argon2';
 import { PrismaService } from 'src/prisma.service';
-import { GoogleUserDetails, JwtPayload, Tokens } from 'src/types';
 
 @Injectable()
 export class AuthService {
   constructor(private prisma: PrismaService, private jwtService: JwtService) {}
 
-  async validateUser(googleUserDetails: GoogleUserDetails): Promise<User> {
+  async validateUser(googleUserDetails): Promise<User> {
     const { email } = googleUserDetails;
 
     const user = await this.prisma.user.findUnique({
@@ -21,7 +20,7 @@ export class AuthService {
     return await this.createUser(googleUserDetails);
   }
 
-  async createUser(googleUserDetails: GoogleUserDetails): Promise<User> {
+  async createUser(googleUserDetails): Promise<User> {
     const user = await this.prisma.user.create({
       data: {
         username: googleUserDetails.username,
@@ -70,7 +69,6 @@ export class AuthService {
 
     if (!IsRefreshTokenMatches) throw new ForbiddenException('Access denied');
     const tokens = await this.getTokens(user);
-    console.log(tokens);
 
     await this.updateDBRefreshToken(user.id, tokens.refresh_token);
     return tokens;
@@ -93,9 +91,9 @@ export class AuthService {
     });
   }
 
-  async getTokens(user: User): Promise<Tokens> {
+  async getTokens(user: User) {
     const { id, username, email, avatarUrl } = user;
-    const jwtPayload: JwtPayload = {
+    const jwtPayload = {
       sub: id,
       username,
       email,
