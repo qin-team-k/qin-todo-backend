@@ -14,6 +14,6 @@ export class AuthController {
   @Version('1')
   @Get('profile')
   profile(@Req() req) {
-    return req.uid;
+    return { id: '123', name: 'osamu' };
   }
 }
