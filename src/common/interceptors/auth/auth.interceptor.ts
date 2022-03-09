@@ -1,6 +1,7 @@
 import {
   CallHandler,
   ExecutionContext,
+  ForbiddenException,
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
@@ -20,6 +21,8 @@ export class AuthInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
     const token = request.headers['authorization'].split(' ')[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
+    // FIX ME tokenが違っていた場合のエラーハンドリング。現在は500になる。
+    if (!decodedToken) throw new ForbiddenException('Access denied');
     request.uid = decodedToken.uid;
 
     return next.handle();
