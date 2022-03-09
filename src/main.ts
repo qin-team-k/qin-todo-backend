@@ -4,6 +4,8 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { ServiceAccount } from 'firebase-admin';
+import * as admin from 'firebase-admin';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -11,6 +13,17 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+
+  // 環境変数の値を指定してfirebase-admin用のConfigオブジェクトを作成
+  const adminConfig: ServiceAccount = {
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  };
+  // firebase-adminの初期化
+  admin.initializeApp({
+    credential: admin.credential.cert(adminConfig),
+  });
 
   app.setGlobalPrefix('api');
 
