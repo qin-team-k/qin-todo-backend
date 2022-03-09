@@ -20,9 +20,6 @@ export class TodoInterceptor implements NestInterceptor {
   ): Promise<Observable<any>> {
     const request = context.switchToHttp().getRequest();
 
-    // console.log(request.query);
-    // console.log(request.body);
-
     const token = request.headers['authorization'].split(' ')[1];
     const decodedToken = await admin.auth().verifyIdToken(token);
     // FIX ME tokenが違っていた場合のエラーハンドリング。現在は500になる。
@@ -33,10 +30,6 @@ export class TodoInterceptor implements NestInterceptor {
       picture: decodedToken.picture,
       uid: decodedToken.uid,
     };
-
-    /**
-     * 必要な情報のみ返す(UserDto内の@Expose()のみ)
-     */
 
     return next.handle();
   }
