@@ -9,6 +9,7 @@ datasource db {
 
 model User {
   id         String      @id
+  uid        String      @unique
   username   String      @map("username") @db.VarChar(100)
   email      String      @unique @db.VarChar(191)
   avatarUrl  String      @map("avatar_url") @db.VarChar(255)
@@ -17,6 +18,7 @@ model User {
   todos      Todo[]
   todoStatus TodoOrder[]
 
+  @@unique([uid, email])
   @@map("user")
 }
 
