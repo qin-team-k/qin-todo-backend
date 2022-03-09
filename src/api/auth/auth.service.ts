@@ -33,9 +33,9 @@ export class AuthService {
       });
       await prisma.todoOrder.createMany({
         data: [
-          { userId: user.id, status: 'TODAY' },
-          { userId: user.id, status: 'TOMORROW' },
-          { userId: user.id, status: 'NEXT' },
+          { uid: user.uid, status: 'TODAY' },
+          { uid: user.uid, status: 'TOMORROW' },
+          { uid: user.uid, status: 'NEXT' },
         ],
       });
       return user;

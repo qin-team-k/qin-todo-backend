@@ -11,12 +11,11 @@ export class TodoService {
   constructor(private prisma: PrismaService) {}
 
   // Todo一覧取得
-  async findAll(userId: string): Promise<FindAllRes> {
+  async findAll(uid: string): Promise<FindAllRes> {
     const todoOrders = await this.prisma.todoOrder.findMany({
-      where: {
-        userId,
-      },
+      where: { uid },
     });
+
     const todayTodoOrder = todoOrders.filter(
       (todoOrder) => todoOrder.status === TodoStatus.TODAY,
     );
@@ -51,7 +50,7 @@ export class TodoService {
 
     const todos = await this.prisma.todo.findMany({
       where: {
-        userId,
+        uid,
       },
     });
 
@@ -80,10 +79,10 @@ export class TodoService {
 
   // Todo作成
   // FIXME トランザクションを追加
-  async create(userId: string, todo: CreateTodoDto): Promise<Todo> {
+  async create(uid: string, todo: CreateTodoDto): Promise<Todo> {
     const createdTodo = await this.prisma.todo.create({
       data: {
-        userId,
+        uid,
         status: todo.status,
         content: todo.content,
       },
@@ -91,18 +90,18 @@ export class TodoService {
 
     const todoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: todo.status,
         },
       },
     });
 
-    if (todoOrders.todoIds === '') {
+    if (!todoOrders.todoIds) {
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: todo.status,
           },
         },
@@ -116,8 +115,8 @@ export class TodoService {
       currentTodoIds.push(String(createdTodo.id));
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: todo.status,
           },
         },
@@ -131,13 +130,13 @@ export class TodoService {
 
   // Todo複製
   // FIXME トランザクションを追加
-  async duplicate(userId: string, todoId: number): Promise<Todo> {
+  async duplicate(uid: string, todoId: number): Promise<Todo> {
     const todo = await this.prisma.todo.findUnique({
       where: { id: todoId },
     });
     const duplicatedTodo = await this.prisma.todo.create({
       data: {
-        userId,
+        uid,
         status: todo.status,
         content: todo.content,
       },
@@ -145,8 +144,8 @@ export class TodoService {
 
     const todoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: todo.status,
         },
       },
@@ -156,8 +155,8 @@ export class TodoService {
     currentTodoIds.splice(todoIdIndex + 1, 0, String(duplicatedTodo.id));
     await this.prisma.todoOrder.update({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: todo.status,
         },
       },
@@ -189,7 +188,7 @@ export class TodoService {
   // Todo並び替え
   // FIXME トランザクションを追加
   async updateOrder(
-    userId: string,
+    uid: string,
     todoId: number,
     todo: UpdateTodoOrderDto,
   ): Promise<void> {
@@ -201,8 +200,8 @@ export class TodoService {
     // 現在のtodoOrderを取得
     const currentTodoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: currentTodo.status,
         },
       },
@@ -214,8 +213,8 @@ export class TodoService {
       .filter((id) => id !== String(todoId));
     const deletedTodoOrder = await this.prisma.todoOrder.update({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: currentTodo.status,
         },
       },
@@ -227,8 +226,8 @@ export class TodoService {
     if (!deletedTodoOrder.todoIds) {
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: currentTodo.status,
           },
         },
@@ -247,8 +246,8 @@ export class TodoService {
     // 更新先のtodoOrderを取得
     const updateTodoOrders = await this.prisma.todoOrder.findUnique({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: todo.status,
         },
       },
@@ -262,8 +261,8 @@ export class TodoService {
 
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: todo.status,
           },
         },
@@ -275,8 +274,8 @@ export class TodoService {
       updateTodoOrders.todoIds = String(todoId);
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: todo.status,
           },
         },
@@ -299,7 +298,7 @@ export class TodoService {
 
   // Todo削除
   // FIXME トランザクションを追加
-  async delete(userId: string, todoId: number): Promise<void> {
+  async delete(uid: string, todoId: number): Promise<void> {
     const deletedTodo = await this.prisma.todo.delete({
       where: {
         id: todoId,
@@ -308,8 +307,8 @@ export class TodoService {
 
     const todoOrder = await this.prisma.todoOrder.findUnique({
       where: {
-        userId_status: {
-          userId,
+        uid_status: {
+          uid,
           status: deletedTodo.status,
         },
       },
@@ -323,8 +322,8 @@ export class TodoService {
     if (deletedTodoIds.length) {
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: deletedTodo.status,
           },
         },
@@ -335,8 +334,8 @@ export class TodoService {
     } else {
       await this.prisma.todoOrder.update({
         where: {
-          userId_status: {
-            userId,
+          uid_status: {
+            uid,
             status: deletedTodo.status,
           },
         },

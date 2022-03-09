@@ -7,9 +7,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseInterceptors,
   Version,
 } from '@nestjs/common';
 import { Todo } from '@prisma/client';
+import { GetCurrentFirebaseUid } from 'src/common/decorators/current-firebase-uid.decorator';
+import { TodoInterceptor } from 'src/common/interceptors/todo/todo.interceptor';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -17,38 +20,41 @@ import { FindAllRes } from './response/findAll.response.';
 import { TodoService } from './todo.service';
 
 @Controller('todos')
+@UseInterceptors(TodoInterceptor)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll(): Promise<FindAllRes> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.findAll(userId);
+  findAll(@GetCurrentFirebaseUid() firebaseUid: string): Promise<FindAllRes> {
+    return this.todoService.findAll(firebaseUid);
   }
 
   // Todo作成
   @Version('1')
   @Post()
-  create(@Body() todo: CreateTodoDto): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.create(userId, todo);
+  create(
+    @Body() todo: CreateTodoDto,
+    @GetCurrentFirebaseUid() firebaseUid: string,
+  ): Promise<Todo> {
+    return this.todoService.create(firebaseUid, todo);
   }
 
   // Todo複製
   @Version('1')
   @Post(':todoId/duplicate')
-  duplicate(@Param('todoId', ParseIntPipe) todoId: number): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.duplicate(userId, todoId);
+  duplicate(
+    @Param('todoId', ParseIntPipe) todoId: number,
+    @GetCurrentFirebaseUid() firebaseUid: string,
+  ): Promise<Todo> {
+    return this.todoService.duplicate(firebaseUid, todoId);
   }
 
   // 完了・未完了の切り替え
   @Version('1')
   @Put(':todoId/toggle')
   toggleDone(@Param('todoId', ParseIntPipe) todoId: number): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.toggleDone(todoId);
   }
 
@@ -58,9 +64,9 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
+    @GetCurrentFirebaseUid() firebaseUid: string,
   ): Promise<void> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.updateOrder(userId, todoId, todo);
+    return this.todoService.updateOrder(firebaseUid, todoId, todo);
   }
 
   // Todo内容更新
@@ -70,15 +76,16 @@ export class TodoController {
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoDto,
   ): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateContent(todoId, todo);
   }
 
   // Todo削除
   @Version('1')
   @Delete(':todoId')
-  delete(@Param('todoId', ParseIntPipe) todoId: number): Promise<void> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.delete(userId, todoId);
+  delete(
+    @Param('todoId', ParseIntPipe) todoId: number,
+    @GetCurrentFirebaseUid() firebaseUid: string,
+  ): Promise<void> {
+    return this.todoService.delete(firebaseUid, todoId);
   }
 }
