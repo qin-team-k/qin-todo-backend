@@ -20,31 +20,31 @@ model User {
   todos      Todo[]
   todoStatus TodoOrder[]
 
-  @@unique([uid, email])
+  @@unique([id, email])
   @@map("user")
 }
 
 model Todo {
   id        Int        @id @default(autoincrement())
-  userId    String
+  uid       String     @map("firebase_uid")
   status    TodoStatus
   done      Boolean    @default(false)
   content   String     @db.VarChar(255)
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
-  User      User       @relation(fields: [userId], references: [id])
+  User      User       @relation(fields: [uid], references: [uid])
 
   @@map("todo")
 }
 
 model TodoOrder {
   id      Int        @id @default(autoincrement())
-  userId  String
+  uid     String     @map("firebase_uid")
   status  TodoStatus
   todoIds String?    @db.VarChar(1000)
-  User    User       @relation(fields: [userId], references: [id])
+  User    User       @relation(fields: [uid], references: [uid])
 
-  @@unique([userId, status])
+  @@unique([uid, status])
   @@map("todo_order")
 }
 
