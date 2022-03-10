@@ -4,7 +4,7 @@ import { AuthInterceptor } from 'src/common/interceptors/auth/auth.interceptor';
 import { FirebaseUserType } from 'src/types';
 import { AuthService } from './auth.service';
 
-@Controller('auth')
+@Controller('users')
 @UseInterceptors(AuthInterceptor)
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -15,8 +15,8 @@ export class AuthController {
    */
 
   @Version('1')
-  @Get('profile')
-  profile(@GetCurrentUser() user: FirebaseUserType) {
+  @Get()
+  users(@GetCurrentUser() user: FirebaseUserType) {
     return this.authService.validateUser(user);
   }
 }
