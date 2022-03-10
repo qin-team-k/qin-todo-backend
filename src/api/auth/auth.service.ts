@@ -5,7 +5,7 @@ import { FirebaseUserType } from 'src/types';
 
 @Injectable()
 export class AuthService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async validateUser(firebaseUser: FirebaseUserType): Promise<User> {
     const user = await this.prisma.user.findUnique({
@@ -39,6 +39,20 @@ export class AuthService {
         ],
       });
       return user;
+    });
+  }
+
+  async deleteUser(uid: string) {
+    await this.prisma.$transaction(async (prisma) => {
+      await prisma.todoOrder.deleteMany({
+        where: { uid },
+      });
+      await prisma.todo.deleteMany({
+        where: { uid },
+      });
+      await prisma.user.delete({
+        where: { uid },
+      });
     });
   }
 }

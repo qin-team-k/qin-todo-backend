@@ -4,6 +4,7 @@ export class UserDto {
   @Expose()
   id: string;
 
+  @Expose()
   uid: string;
 
   @Expose()
