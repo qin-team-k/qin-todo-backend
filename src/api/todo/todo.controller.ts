@@ -11,7 +11,7 @@ import {
   Version,
 } from '@nestjs/common';
 import { Todo } from '@prisma/client';
-import { GetCurrentFirebaseUid } from 'src/common/decorators/current-firebase-uid.decorator';
+import { GetFirebaseUid } from 'src/common/decorators/current-firebase-uid.decorator';
 import { TodoInterceptor } from 'src/common/interceptors/todo/todo.interceptor';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
@@ -27,7 +27,7 @@ export class TodoController {
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll(@GetCurrentFirebaseUid() firebaseUid: string): Promise<FindAllRes> {
+  findAll(@GetFirebaseUid() firebaseUid: string): Promise<FindAllRes> {
     return this.todoService.findAll(firebaseUid);
   }
 
@@ -36,7 +36,7 @@ export class TodoController {
   @Post()
   create(
     @Body() todo: CreateTodoDto,
-    @GetCurrentFirebaseUid() firebaseUid: string,
+    @GetFirebaseUid() firebaseUid: string,
   ): Promise<Todo> {
     return this.todoService.create(firebaseUid, todo);
   }
@@ -46,7 +46,7 @@ export class TodoController {
   @Post(':todoId/duplicate')
   duplicate(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @GetCurrentFirebaseUid() firebaseUid: string,
+    @GetFirebaseUid() firebaseUid: string,
   ): Promise<Todo> {
     return this.todoService.duplicate(firebaseUid, todoId);
   }
@@ -64,7 +64,7 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
-    @GetCurrentFirebaseUid() firebaseUid: string,
+    @GetFirebaseUid() firebaseUid: string,
   ): Promise<void> {
     return this.todoService.updateOrder(firebaseUid, todoId, todo);
   }
@@ -84,7 +84,7 @@ export class TodoController {
   @Delete(':todoId')
   delete(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @GetCurrentFirebaseUid() firebaseUid: string,
+    @GetFirebaseUid() firebaseUid: string,
   ): Promise<void> {
     return this.todoService.delete(firebaseUid, todoId);
   }
