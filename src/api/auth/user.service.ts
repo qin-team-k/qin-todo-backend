@@ -4,7 +4,7 @@ import { PrismaService } from 'src/prisma.service';
 import { FirebaseUserType } from 'src/types';
 
 @Injectable()
-export class AuthService {
+export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async validateUser(firebaseUser: FirebaseUserType): Promise<User> {

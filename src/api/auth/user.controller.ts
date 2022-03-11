@@ -3,11 +3,11 @@ import { User } from '@prisma/client';
 import { GetFirebaseUser } from 'src/common/decorators';
 
 import { FirebaseUserType } from 'src/types';
-import { AuthService } from './auth.service';
+import { UserService } from './user.service';
 
 @Controller('users')
-export class AuthController {
-  constructor(private authService: AuthService) {}
+export class UserController {
+  constructor(private userService: UserService) {}
 
   /**
    * GET /api/v1/users
@@ -17,7 +17,7 @@ export class AuthController {
   @Version('1')
   @Get()
   async users(@GetFirebaseUser() user: FirebaseUserType): Promise<User> {
-    return await this.authService.validateUser(user);
+    return await this.userService.validateUser(user);
   }
 
   /**
@@ -27,6 +27,6 @@ export class AuthController {
   @Version('1')
   @Delete(':uid')
   async delete(@Param('uid') uid: string) {
-    await this.authService.deleteUser(uid);
+    await this.userService.deleteUser(uid);
   }
 }
