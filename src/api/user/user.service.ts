@@ -13,14 +13,34 @@ export class UserService {
     });
 
     if (!user) {
-      const newUser = await this.createNewUser(firebaseUser);
-      return newUser;
+      return await this.initUser(firebaseUser);
     }
 
     return user;
   }
 
-  async createNewUser(firebaseUser: FirebaseUserType) {
+  async createUser(firebaseUser: FirebaseUserType) {
+    return await this.prisma.user.create({
+      data: {
+        uid: firebaseUser.uid,
+        username: firebaseUser.name,
+        email: firebaseUser.email,
+        avatarUrl: firebaseUser.picture,
+      },
+    });
+  }
+
+  async createTodoOrder(user) {
+    return await this.prisma.todoOrder.createMany({
+      data: [
+        { uuid: user.id, status: 'TODAY' },
+        { uuid: user.id, status: 'TOMORROW' },
+        { uuid: user.id, status: 'NEXT' },
+      ],
+    });
+  }
+
+  async initUser(firebaseUser: FirebaseUserType) {
     // schema.prismaの generator に previewFeatures = ["interactiveTransactions"] を追加後 npx prisma generate し直す
     return await this.prisma.$transaction(async (prisma): Promise<User> => {
       const user = await prisma.user.create({
