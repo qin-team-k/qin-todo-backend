@@ -1,20 +1,11 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  UseInterceptors,
-  Version,
-} from '@nestjs/common';
+import { Controller, Delete, Get, Param, Version } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetFirebaseUser } from 'src/common/decorators';
 
-import { AuthInterceptor } from 'src/common/interceptors/auth/auth.interceptor';
 import { FirebaseUserType } from 'src/types';
 import { AuthService } from './auth.service';
 
 @Controller('users')
-@UseInterceptors(AuthInterceptor)
 export class AuthController {
   constructor(private authService: AuthService) {}
 

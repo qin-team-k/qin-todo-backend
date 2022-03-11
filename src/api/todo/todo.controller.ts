@@ -7,12 +7,10 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  UseInterceptors,
   Version,
 } from '@nestjs/common';
 import { Todo } from '@prisma/client';
 import { GetFirebaseUid } from 'src/common/decorators/current-firebase-uid.decorator';
-import { TodoInterceptor } from 'src/common/interceptors/todo/todo.interceptor';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -20,7 +18,6 @@ import { FindAllRes } from './response/findAll.response.';
 import { TodoService } from './todo.service';
 
 @Controller('todos')
-@UseInterceptors(TodoInterceptor)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
