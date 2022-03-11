@@ -5,7 +5,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import * as admin from 'firebase-admin';
-import { UserService } from 'src/api/auth/user.service';
+import { UserService } from 'src/api/user/user.service';
 
 @Injectable()
 export class AuthenticateGuard implements CanActivate {
@@ -24,7 +24,8 @@ export class AuthenticateGuard implements CanActivate {
       };
 
       const user = await this.userService.validateUser(firebaseUser);
-      request.user = user;
+      request['user'] = user;
+
       return true;
     } catch (error) {
       throw new ForbiddenException('Access denied');

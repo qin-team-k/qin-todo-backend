@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { UserModule } from '../auth/user.module';
+import { UserModule } from '../user/user.module';
 import { TodoController } from './todo.controller';
 import { TodoService } from './todo.service';
 

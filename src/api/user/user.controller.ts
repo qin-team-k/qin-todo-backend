@@ -1,11 +1,6 @@
-import {
-  Controller,
-  Delete,
-  Get,
-  Param,
-  UseGuards,
-  Version,
-} from '@nestjs/common';
+import { Controller, Delete, Get, UseGuards, Version } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { GetCurrentUser, GetCurrentUuid } from 'src/common/decorators';
 import { AuthenticateGuard } from 'src/common/guards/authenticate';
 
 import { UserService } from './user.service';
@@ -22,17 +17,17 @@ export class UserController {
 
   @Version('1')
   @Get()
-  async users() {
-    return 'users';
+  async users(@GetCurrentUser() user: User) {
+    return user;
   }
 
   /**
-   * DELETE /api/v1/users/:uid
+   * DELETE /api/v1/users/delete
    * ユーザーを削除する
    */
   @Version('1')
-  @Delete(':uuid')
-  async delete(@Param('uuid') uuid: string) {
+  @Delete('delete')
+  async delete(@GetCurrentUuid() uuid: string) {
     await this.userService.deleteUser(uuid);
   }
 }
