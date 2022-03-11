@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, UseGuards, Version } from '@nestjs/common';
 import { User } from '@prisma/client';
-import { GetCurrentUser, GetCurrentUuid } from 'src/common/decorators';
+import { GetCurrentUser, GetCurrentUserId } from 'src/common/decorators';
 import { AuthenticateGuard } from 'src/common/guards/authenticate';
 
 import { UserService } from './user.service';
@@ -27,7 +27,7 @@ export class UserController {
    */
   @Version('1')
   @Delete('delete')
-  async delete(@GetCurrentUuid() uuid: string) {
-    await this.userService.deleteUser(uuid);
+  async delete(@GetCurrentUserId() userId: string) {
+    await this.userService.deleteUser(userId);
   }
 }

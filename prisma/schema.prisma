@@ -26,25 +26,25 @@ model User {
 
 model Todo {
   id        Int        @id @default(autoincrement())
-  uuid      String
+  userId    String
   status    TodoStatus
   done      Boolean    @default(false)
   content   String     @db.VarChar(255)
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime   @default(now()) @updatedAt @map("updated_at")
-  User      User       @relation(fields: [uuid], references: [id])
+  User      User       @relation(fields: [userId], references: [id])
 
   @@map("todo")
 }
 
 model TodoOrder {
   id      Int        @id @default(autoincrement())
-  uuid    String
+  userId  String
   status  TodoStatus
   todoIds String?    @db.VarChar(1000)
-  User    User       @relation(fields: [uuid], references: [id])
+  User    User       @relation(fields: [userId], references: [id])
 
-  @@unique([uuid, status])
+  @@unique([userId, status])
   @@map("todo_order")
 }
 

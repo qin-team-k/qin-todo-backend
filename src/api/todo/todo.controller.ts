@@ -11,7 +11,7 @@ import {
   Version,
 } from '@nestjs/common';
 import { Todo } from '@prisma/client';
-import { GetCurrentUuid } from 'src/common/decorators/current-uuid.decorator';
+import { GetCurrentUserId } from 'src/common/decorators/current-userId.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
@@ -27,8 +27,8 @@ export class TodoController {
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll(@GetCurrentUuid() uuid: string): Promise<FindAllRes> {
-    return this.todoService.findAll(uuid);
+  findAll(@GetCurrentUserId() userId: string): Promise<FindAllRes> {
+    return this.todoService.findAll(userId);
   }
 
   // Todo作成
@@ -36,9 +36,9 @@ export class TodoController {
   @Post()
   create(
     @Body() todo: CreateTodoDto,
-    @GetCurrentUuid() uuid: string,
+    @GetCurrentUserId() userId: string,
   ): Promise<Todo> {
-    return this.todoService.create(uuid, todo);
+    return this.todoService.create(userId, todo);
   }
 
   // Todo複製
@@ -46,9 +46,9 @@ export class TodoController {
   @Post(':todoId/duplicate')
   duplicate(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @GetCurrentUuid() uuid: string,
+    @GetCurrentUserId() userId: string,
   ): Promise<Todo> {
-    return this.todoService.duplicate(uuid, todoId);
+    return this.todoService.duplicate(userId, todoId);
   }
 
   // 完了・未完了の切り替え
@@ -64,9 +64,9 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
-    @GetCurrentUuid() uuid: string,
+    @GetCurrentUserId() userId: string,
   ): Promise<void> {
-    return this.todoService.updateOrder(uuid, todoId, todo);
+    return this.todoService.updateOrder(userId, todoId, todo);
   }
 
   // Todo内容更新
@@ -84,7 +84,7 @@ export class TodoController {
   @Delete(':todoId')
   delete(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @GetCurrentUuid() uuid: string,
+    @GetCurrentUserId() uuid: string,
   ): Promise<void> {
     return this.todoService.delete(uuid, todoId);
   }
