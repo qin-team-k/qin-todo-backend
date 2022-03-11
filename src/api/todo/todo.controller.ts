@@ -7,10 +7,12 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
   Version,
 } from '@nestjs/common';
 import { Todo } from '@prisma/client';
 import { GetFirebaseUid } from 'src/common/decorators/current-firebase-uid.decorator';
+import { AuthenticateGuard } from 'src/common/guards/authenticate';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -18,6 +20,7 @@ import { FindAllRes } from './response/findAll.response.';
 import { TodoService } from './todo.service';
 
 @Controller('todos')
+@UseGuards(AuthenticateGuard)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
