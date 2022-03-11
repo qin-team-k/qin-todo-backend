@@ -1,11 +1,17 @@
-import { Controller, Delete, Get, Param, Version } from '@nestjs/common';
-import { User } from '@prisma/client';
-import { GetFirebaseUser } from 'src/common/decorators';
+import {
+  Controller,
+  Delete,
+  Get,
+  Param,
+  UseGuards,
+  Version,
+} from '@nestjs/common';
+import { AuthenticateGuard } from 'src/common/guards/authenticate';
 
-import { FirebaseUserType } from 'src/types';
 import { UserService } from './user.service';
 
 @Controller('users')
+@UseGuards(AuthenticateGuard)
 export class UserController {
   constructor(private userService: UserService) {}
 
@@ -16,8 +22,8 @@ export class UserController {
 
   @Version('1')
   @Get()
-  async users(@GetFirebaseUser() user: FirebaseUserType): Promise<User> {
-    return await this.userService.validateUser(user);
+  async users() {
+    return 'users';
   }
 
   /**
@@ -25,8 +31,8 @@ export class UserController {
    * ユーザーを削除する
    */
   @Version('1')
-  @Delete(':uid')
-  async delete(@Param('uid') uid: string) {
-    await this.userService.deleteUser(uid);
+  @Delete(':uuid')
+  async delete(@Param('uuid') uuid: string) {
+    await this.userService.deleteUser(uuid);
   }
 }

@@ -33,25 +33,25 @@ export class UserService {
       });
       await prisma.todoOrder.createMany({
         data: [
-          { uid: user.uid, status: 'TODAY' },
-          { uid: user.uid, status: 'TOMORROW' },
-          { uid: user.uid, status: 'NEXT' },
+          { uuid: user.id, status: 'TODAY' },
+          { uuid: user.id, status: 'TOMORROW' },
+          { uuid: user.id, status: 'NEXT' },
         ],
       });
       return user;
     });
   }
 
-  async deleteUser(uid: string) {
+  async deleteUser(uuid: string) {
     await this.prisma.$transaction(async (prisma) => {
       await prisma.todoOrder.deleteMany({
-        where: { uid },
+        where: { uuid },
       });
       await prisma.todo.deleteMany({
-        where: { uid },
+        where: { uuid },
       });
       await prisma.user.delete({
-        where: { uid },
+        where: { id: uuid },
       });
     });
   }
