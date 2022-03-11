@@ -1,2 +1,2 @@
-export * from './current-firebase-user.decorator';
-export * from './current-firebase-uid.decorator';
+export * from './current-user.decorator';
+export * from './current-uuid.decorator';
