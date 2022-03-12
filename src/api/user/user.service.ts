@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { FirebaseUserType } from 'src/types';
 
@@ -33,9 +33,9 @@ export class UserService {
   async createTodoOrder(user) {
     return await this.prisma.todoOrder.createMany({
       data: [
-        { userId: user.id, status: 'TODAY' },
-        { userId: user.id, status: 'TOMORROW' },
-        { userId: user.id, status: 'NEXT' },
+        { userId: user.id, status: TodoStatus.TODAY },
+        { userId: user.id, status: TodoStatus.TOMORROW },
+        { userId: user.id, status: TodoStatus.NEXT },
       ],
     });
   }
@@ -52,9 +52,9 @@ export class UserService {
       });
       await prisma.todoOrder.createMany({
         data: [
-          { userId: user.id, status: 'TODAY' },
-          { userId: user.id, status: 'TOMORROW' },
-          { userId: user.id, status: 'NEXT' },
+          { userId: user.id, status: TodoStatus.TODAY },
+          { userId: user.id, status: TodoStatus.TOMORROW },
+          { userId: user.id, status: TodoStatus.NEXT },
         ],
       });
       return user;
