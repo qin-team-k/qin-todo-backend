@@ -41,7 +41,6 @@ export class UserService {
   }
 
   async initUser(firebaseUser: FirebaseUserType) {
-    // schema.prismaの generator に previewFeatures = ["interactiveTransactions"] を追加後 npx prisma generate し直す
     return await this.prisma.$transaction(async (prisma): Promise<User> => {
       const user = await prisma.user.create({
         data: {
