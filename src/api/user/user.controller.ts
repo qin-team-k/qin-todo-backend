@@ -17,7 +17,7 @@ export class UserController {
 
   @Version('1')
   @Get()
-  async users(@GetCurrentUser() user: User) {
+  async users(@GetCurrentUser() user: User): Promise<User> {
     return user;
   }
 
@@ -27,7 +27,7 @@ export class UserController {
    */
   @Version('1')
   @Delete('delete')
-  async delete(@GetCurrentUser() user: User) {
+  async delete(@GetCurrentUser() user: User): Promise<void> {
     await this.userService.deleteUser(user.id);
   }
 }
