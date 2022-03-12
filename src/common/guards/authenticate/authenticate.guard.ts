@@ -23,8 +23,14 @@ export class AuthenticateGuard implements CanActivate {
         uid: decodedToken.uid,
       };
 
-      const user = await this.userService.validateUser(firebaseUser);
-      request['user'] = user;
+      const user = await this.userService.findUserByUid(decodedToken.uid);
+
+      if (!user) {
+        const newUser = await this.userService.initUser(firebaseUser);
+        request['user'] = newUser;
+      } else {
+        request['user'] = user;
+      }
 
       return true;
     } catch (error) {
