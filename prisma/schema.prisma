@@ -19,7 +19,6 @@ model User {
   todos      Todo[]
   todoStatus TodoOrder[]
 
-  @@unique([id, uid])
   @@map("user")
 }
 
