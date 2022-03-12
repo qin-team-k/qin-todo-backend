@@ -1,25 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
-import { FirebaseUserType } from 'src/types';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async validateUser(firebaseUser: FirebaseUserType): Promise<User> {
-    const user = await this.prisma.user.findUnique({
-      where: { uid: firebaseUser.uid },
-    });
-
-    if (!user) {
-      return await this.initUser(firebaseUser);
-    }
-
-    return user;
-  }
-
-  async createUser(firebaseUser: FirebaseUserType) {
+  async createUser(firebaseUser: CreateUserDto): Promise<User> {
     return await this.prisma.user.create({
       data: {
         uid: firebaseUser.uid,
@@ -30,8 +18,14 @@ export class UserService {
     });
   }
 
-  async createTodoOrder(user) {
-    return await this.prisma.todoOrder.createMany({
+  async findUserByUid(uid: string): Promise<User> {
+    return await this.prisma.user.findUnique({
+      where: { uid },
+    });
+  }
+
+  async createTodoOrder(user): Promise<void> {
+    await this.prisma.todoOrder.createMany({
       data: [
         { userId: user.id, status: TodoStatus.TODAY },
         { userId: user.id, status: TodoStatus.TOMORROW },
@@ -40,7 +34,7 @@ export class UserService {
     });
   }
 
-  async initUser(firebaseUser: FirebaseUserType) {
+  async initUser(firebaseUser: CreateUserDto): Promise<User> {
     return await this.prisma.$transaction(async (prisma): Promise<User> => {
       const user = await prisma.user.create({
         data: {
@@ -61,7 +55,7 @@ export class UserService {
     });
   }
 
-  async deleteUser(userId: string) {
+  async deleteUser(userId: string): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
       await prisma.todoOrder.deleteMany({
         where: { userId },
