@@ -1,6 +1,5 @@
 generator client {
   provider        = "prisma-client-js"
-  // 下記追加後 npx prisma generate し直す
   previewFeatures = ["interactiveTransactions"]
 }
 
