@@ -10,9 +10,9 @@ import {
   UseGuards,
   Version,
 } from '@nestjs/common';
-import { Todo } from '@prisma/client';
-import { GetCurrentUserId } from 'src/common/decorators/current-userId.decorator';
-import { AuthenticateGuard } from 'src/common/guards/authenticate';
+import { Todo, User } from '@prisma/client';
+import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
+import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
 import { UpdateTodoDto } from './dto/update-todo.dto';
@@ -27,8 +27,8 @@ export class TodoController {
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll(@GetCurrentUserId() userId: string): Promise<FindAllRes> {
-    return this.todoService.findAll(userId);
+  findAll(@GetCurrentUser() user: User): Promise<FindAllRes> {
+    return this.todoService.findAll(user.id);
   }
 
   // Todo作成
@@ -36,9 +36,9 @@ export class TodoController {
   @Post()
   create(
     @Body() todo: CreateTodoDto,
-    @GetCurrentUserId() userId: string,
+    @GetCurrentUser() user: User,
   ): Promise<Todo> {
-    return this.todoService.create(userId, todo);
+    return this.todoService.create(user.id, todo);
   }
 
   // Todo複製
@@ -46,9 +46,9 @@ export class TodoController {
   @Post(':todoId/duplicate')
   duplicate(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @GetCurrentUserId() userId: string,
+    @GetCurrentUser() user: User,
   ): Promise<Todo> {
-    return this.todoService.duplicate(userId, todoId);
+    return this.todoService.duplicate(user.id, todoId);
   }
 
   // 完了・未完了の切り替え
@@ -64,9 +64,9 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
-    @GetCurrentUserId() userId: string,
+    @GetCurrentUser() user: User,
   ): Promise<void> {
-    return this.todoService.updateOrder(userId, todoId, todo);
+    return this.todoService.updateOrder(user.id, todoId, todo);
   }
 
   // Todo内容更新
@@ -84,8 +84,8 @@ export class TodoController {
   @Delete(':todoId')
   delete(
     @Param('todoId', ParseIntPipe) todoId: number,
-    @GetCurrentUserId() uuid: string,
+    @GetCurrentUser() user: User,
   ): Promise<void> {
-    return this.todoService.delete(uuid, todoId);
+    return this.todoService.delete(user.id, todoId);
   }
 }
