@@ -55,6 +55,20 @@ export class UserService {
     });
   }
 
+  async updateUsername(userId: string, username: string) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: { username },
+    });
+  }
+
+  async updateAvatarUrl(userId: string, avatarUrl: string) {
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarUrl },
+    });
+  }
+
   async deleteUser(userId: string): Promise<void> {
     await this.prisma.$transaction(async (prisma) => {
       await prisma.todoOrder.deleteMany({

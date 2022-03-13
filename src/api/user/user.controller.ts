@@ -1,4 +1,12 @@
-import { Controller, Delete, Get, UseGuards, Version } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Put,
+  UseGuards,
+  Version,
+} from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
@@ -19,6 +27,20 @@ export class UserController {
   @Get()
   async users(@GetCurrentUser() user: User): Promise<User> {
     return user;
+  }
+
+  /**
+   * GET /api/v1/users
+   * ユーザー情報を返す
+   */
+
+  @Version('1')
+  @Put('update')
+  async updateUser(
+    @GetCurrentUser() user: User,
+    @Body('username') username: string,
+  ): Promise<User> {
+    return await this.userService.updateUsername(user.id, username);
   }
 
   /**
