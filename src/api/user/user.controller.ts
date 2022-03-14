@@ -6,13 +6,17 @@ import {
   Param,
   ParseUUIDPipe,
   Put,
+  Req,
   UseGuards,
+  UseInterceptors,
   Version,
 } from '@nestjs/common';
 import { User } from '@prisma/client';
+import { FastifyRequest } from 'fastify';
+import { FileUploadInterceptor } from 'src/common/Interceptors/file-upload.interceptor';
+import { GetAvatarImage } from 'src/common/decorators/avatar-image.decorator';
 import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
-
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -53,12 +57,16 @@ export class UserController {
    */
 
   @Version('1')
+  @UseInterceptors(FileUploadInterceptor)
   @Put(':userId/avatar')
   async updateAvatar(
     @GetCurrentUser() user: User,
     @Param('userId', ParseUUIDPipe) userId: string,
+    @GetAvatarImage() avatarImage,
+    @Req() req: FastifyRequest,
   ): Promise<any> {
-    return 'uploaded avatar';
+    this.userService.updateAvatarUrl(user.id, userId, req);
+    return 'uploaded image';
   }
 
   /**
