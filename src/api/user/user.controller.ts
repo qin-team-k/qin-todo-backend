@@ -32,8 +32,8 @@ export class UserController {
   }
 
   /**
-   * GET /api/v1/users
-   * ユーザー情報を返す
+   * PUT /api/v1/users/:userId
+   * ユーザー名を更新する
    */
 
   @Version('1')
