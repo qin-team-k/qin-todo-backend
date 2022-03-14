@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  Param,
+  ParseUUIDPipe,
   Put,
   UseGuards,
   Version,
@@ -35,12 +37,14 @@ export class UserController {
    */
 
   @Version('1')
-  @Put('update')
+  @Put(':userId')
   async updateUser(
     @GetCurrentUser() user: User,
-    @Body('username') username: string,
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body('username')
+    username: string,
   ): Promise<User> {
-    return await this.userService.updateUsername(user.id, username);
+    return await this.userService.updateUsername(user.id, userId, username);
   }
 
   /**

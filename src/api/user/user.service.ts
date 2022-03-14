@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -55,7 +55,10 @@ export class UserService {
     });
   }
 
-  async updateUsername(userId: string, username: string) {
+  async updateUsername(userId: string, paramUserId, username: string) {
+    if (userId !== paramUserId) {
+      throw new ForbiddenException('Access denied');
+    }
     return await this.prisma.user.update({
       where: { id: userId },
       data: { username },
