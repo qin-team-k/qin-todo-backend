@@ -48,6 +48,20 @@ export class UserController {
   }
 
   /**
+   * PUT /api/v1/users/:userId/avatar
+   * アバター画像を更新する
+   */
+
+  @Version('1')
+  @Put(':userId/avatar')
+  async updateAvatar(
+    @GetCurrentUser() user: User,
+    @Param('userId', ParseUUIDPipe) userId: string,
+  ): Promise<any> {
+    return 'uploaded avatar';
+  }
+
+  /**
    * DELETE /api/v1/users/delete
    * ユーザーを削除する
    */
