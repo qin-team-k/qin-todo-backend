@@ -34,14 +34,14 @@ export class UserService {
     });
   }
 
-  async initUser(firebaseUser: CreateUserDto): Promise<User> {
+  async initUser(createUserDto: CreateUserDto): Promise<User> {
     return await this.prisma.$transaction(async (prisma): Promise<User> => {
       const user = await prisma.user.create({
         data: {
-          uid: firebaseUser.uid,
-          username: firebaseUser.name,
-          email: firebaseUser.email,
-          avatarUrl: firebaseUser.picture,
+          uid: createUserDto.uid,
+          username: createUserDto.name,
+          email: createUserDto.email,
+          avatarUrl: createUserDto.picture,
         },
       });
       await prisma.todoOrder.createMany({
