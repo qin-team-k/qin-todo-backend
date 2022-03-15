@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["interactiveTransactions"]
 }
 
 datasource db {
@@ -8,7 +9,8 @@ datasource db {
 }
 
 model User {
-  id         String      @id
+  id         String      @id @default(uuid())
+  uid        String      @unique
   username   String      @map("username") @db.VarChar(100)
   email      String      @unique @db.VarChar(191)
   avatarUrl  String      @map("avatar_url") @db.VarChar(255)

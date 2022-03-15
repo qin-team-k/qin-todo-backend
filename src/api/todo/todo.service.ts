@@ -13,10 +13,9 @@ export class TodoService {
   // Todo一覧取得
   async findAll(userId: string): Promise<FindAllRes> {
     const todoOrders = await this.prisma.todoOrder.findMany({
-      where: {
-        userId,
-      },
+      where: { userId },
     });
+
     const todayTodoOrder = todoOrders.filter(
       (todoOrder) => todoOrder.status === TodoStatus.TODAY,
     );
@@ -98,7 +97,7 @@ export class TodoService {
       },
     });
 
-    if (todoOrders.todoIds === '') {
+    if (!todoOrders.todoIds) {
       await this.prisma.todoOrder.update({
         where: {
           userId_status: {

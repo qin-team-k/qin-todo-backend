@@ -6,6 +6,7 @@ export const user = async () => {
     data: [
       {
         id: '4ff64eb1-c22a-4455-a50d-75cdc3c1e561',
+        uid: '5tHcvHXVTradwkofKQXPnq0VU0r0',
         username: 'John Doe',
         email: 'john@example.com',
         avatarUrl:
@@ -13,6 +14,7 @@ export const user = async () => {
       },
       {
         id: '62ac362a-cd60-45b1-9100-3b469eceb31d',
+        uid: 'TradwkofKQXPnq0VU0r5tHcvHXV3',
         username: 'Sam Smith',
         email: 'sam@example.com',
         avatarUrl:
@@ -20,6 +22,7 @@ export const user = async () => {
       },
       {
         id: '7d564bce-2b98-4a86-b5b3-a942e6241584',
+        uid: 'Pnq0VU0r5tHcvHXVTradwkofKQX4',
         username: 'Tomas Cruise',
         email: 'tom@example.com',
         avatarUrl:

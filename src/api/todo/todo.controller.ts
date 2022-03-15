@@ -1,4 +1,3 @@
-import { UpdateTodoDto } from './dto/update-todo.dto';
 import {
   Body,
   Controller,
@@ -8,47 +7,54 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  UseGuards,
   Version,
 } from '@nestjs/common';
-import { TodoService } from './todo.service';
-import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
+import { Todo, User } from '@prisma/client';
+import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
+import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
 import { CreateTodoDto } from './dto/create-todo.dto';
+import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
+import { UpdateTodoDto } from './dto/update-todo.dto';
 import { FindAllRes } from './response/findAll.response.';
-import { Todo } from '@prisma/client';
+import { TodoService } from './todo.service';
 
 @Controller('todos')
+@UseGuards(AuthenticateGuard)
 export class TodoController {
   constructor(private readonly todoService: TodoService) {}
 
   // Todo一覧取得
   @Version('1')
   @Get()
-  findAll(): Promise<FindAllRes> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.findAll(userId);
+  findAll(@GetCurrentUser() user: User): Promise<FindAllRes> {
+    return this.todoService.findAll(user.id);
   }
 
   // Todo作成
   @Version('1')
   @Post()
-  create(@Body() todo: CreateTodoDto): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.create(userId, todo);
+  create(
+    @Body() todo: CreateTodoDto,
+    @GetCurrentUser() user: User,
+  ): Promise<Todo> {
+    return this.todoService.create(user.id, todo);
   }
 
   // Todo複製
   @Version('1')
   @Post(':todoId/duplicate')
-  duplicate(@Param('todoId', ParseIntPipe) todoId: number): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.duplicate(userId, todoId);
+  duplicate(
+    @Param('todoId', ParseIntPipe) todoId: number,
+    @GetCurrentUser() user: User,
+  ): Promise<Todo> {
+    return this.todoService.duplicate(user.id, todoId);
   }
 
   // 完了・未完了の切り替え
   @Version('1')
   @Put(':todoId/toggle')
   toggleDone(@Param('todoId', ParseIntPipe) todoId: number): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.toggleDone(todoId);
   }
 
@@ -58,9 +64,9 @@ export class TodoController {
   updateOrder(
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoOrderDto,
+    @GetCurrentUser() user: User,
   ): Promise<void> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.updateOrder(userId, todoId, todo);
+    return this.todoService.updateOrder(user.id, todoId, todo);
   }
 
   // Todo内容更新
@@ -70,15 +76,16 @@ export class TodoController {
     @Param('todoId', ParseIntPipe) todoId: number,
     @Body() todo: UpdateTodoDto,
   ): Promise<Todo> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
     return this.todoService.updateContent(todoId, todo);
   }
 
   // Todo削除
   @Version('1')
   @Delete(':todoId')
-  delete(@Param('todoId', ParseIntPipe) todoId: number): Promise<void> {
-    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
-    return this.todoService.delete(userId, todoId);
+  delete(
+    @Param('todoId', ParseIntPipe) todoId: number,
+    @GetCurrentUser() user: User,
+  ): Promise<void> {
+    return this.todoService.delete(user.id, todoId);
   }
 }
