@@ -1,19 +1,11 @@
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import {
-  FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
 import { ServiceAccount } from 'firebase-admin';
 import * as admin from 'firebase-admin';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestFastifyApplication>(
-    AppModule,
-    new FastifyAdapter(),
-    { cors: true },
-  );
+  const app = await NestFactory.create(AppModule, { cors: true });
 
   // 環境変数の値を指定してfirebase-admin用のConfigオブジェクトを作成
   const adminConfig: ServiceAccount = {
