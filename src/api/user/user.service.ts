@@ -7,13 +7,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createUser(firebaseUser: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     return await this.prisma.user.create({
       data: {
-        uid: firebaseUser.uid,
-        username: firebaseUser.name,
-        email: firebaseUser.email,
-        avatarUrl: firebaseUser.picture,
+        uid: createUserDto.uid,
+        username: createUserDto.name,
+        email: createUserDto.email,
+        avatarUrl: createUserDto.avatarUrl,
       },
     });
   }
@@ -41,7 +41,7 @@ export class UserService {
           uid: createUserDto.uid,
           username: createUserDto.name,
           email: createUserDto.email,
-          avatarUrl: createUserDto.picture,
+          avatarUrl: createUserDto.avatarUrl,
         },
       });
       await prisma.todoOrder.createMany({
