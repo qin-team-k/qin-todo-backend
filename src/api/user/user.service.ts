@@ -1,11 +1,15 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
+import { CloudStorageService } from '../cloud-storage/cloud-storage.service';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly cloudStorageService: CloudStorageService,
+  ) {}
 
   async createUser(firebaseUser: CreateUserDto): Promise<User> {
     return await this.prisma.user.create({
@@ -65,11 +69,11 @@ export class UserService {
     });
   }
 
-  async updateAvatarUrl(userId: string, avatarUrl: string) {
-    return await this.prisma.user.update({
-      where: { id: userId },
-      data: { avatarUrl },
-    });
+  async updateAvatarUrl(userId: string, paramUserId, file) {
+    if (userId !== paramUserId) {
+      throw new ForbiddenException('Access denied');
+    }
+    return this.cloudStorageService.uploadFile(file);
   }
 
   async deleteUser(userId: string): Promise<void> {
