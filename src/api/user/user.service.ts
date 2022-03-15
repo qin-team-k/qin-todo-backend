@@ -34,6 +34,7 @@ export class UserService {
     });
   }
 
+  // FIXME 初回ログイン時にもストレージにファイルの保存する
   async initUser(createUserDto: CreateUserDto): Promise<User> {
     return await this.prisma.$transaction(async (prisma): Promise<User> => {
       const user = await prisma.user.create({
