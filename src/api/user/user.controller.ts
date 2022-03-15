@@ -6,14 +6,13 @@ import {
   Param,
   ParseUUIDPipe,
   Put,
-  Req,
+  UploadedFile,
   UseGuards,
   UseInterceptors,
   Version,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '@prisma/client';
-import { FastifyRequest } from 'fastify';
-import { FileUploadInterceptor } from 'src/common/Interceptors/file-upload.interceptor';
 import { GetAvatarImage } from 'src/common/decorators/avatar-image.decorator';
 import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
@@ -57,16 +56,15 @@ export class UserController {
    */
 
   @Version('1')
-  @UseInterceptors(FileUploadInterceptor)
   @Put(':userId/avatar')
+  @UseInterceptors(FileInterceptor('file'))
   async updateAvatar(
     @GetCurrentUser() user: User,
     @Param('userId', ParseUUIDPipe) userId: string,
     @GetAvatarImage() avatarImage,
-    @Req() req: FastifyRequest,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
-    this.userService.updateAvatarUrl(user.id, userId, req);
-    return 'uploaded image';
+    return this.userService.updateAvatarUrl(user.id, userId, file);
   }
 
   /**
