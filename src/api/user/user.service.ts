@@ -11,13 +11,13 @@ export class UserService {
     private readonly cloudStorageService: CloudStorageService,
   ) {}
 
-  async createUser(firebaseUser: CreateUserDto): Promise<User> {
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     return await this.prisma.user.create({
       data: {
-        uid: firebaseUser.uid,
-        username: firebaseUser.name,
-        email: firebaseUser.email,
-        avatarUrl: firebaseUser.picture,
+        uid: createUserDto.uid,
+        username: createUserDto.name,
+        email: createUserDto.email,
+        avatarUrl: createUserDto.avatarUrl,
       },
     });
   }
@@ -38,14 +38,15 @@ export class UserService {
     });
   }
 
-  async initUser(firebaseUser: CreateUserDto): Promise<User> {
+  // FIXME 初回ログイン時にもストレージにファイルの保存する
+  async initUser(createUserDto: CreateUserDto): Promise<User> {
     return await this.prisma.$transaction(async (prisma): Promise<User> => {
       const user = await prisma.user.create({
         data: {
-          uid: firebaseUser.uid,
-          username: firebaseUser.name,
-          email: firebaseUser.email,
-          avatarUrl: firebaseUser.picture,
+          uid: createUserDto.uid,
+          username: createUserDto.name,
+          email: createUserDto.email,
+          avatarUrl: createUserDto.avatarUrl,
         },
       });
       await prisma.todoOrder.createMany({

@@ -20,7 +20,7 @@ export class CreateUserDto {
   @IsUrl()
   @IsNotEmpty()
   @MaxLength(255)
-  picture: string;
+  avatarUrl: string;
 
   @IsString()
   @IsNotEmpty()

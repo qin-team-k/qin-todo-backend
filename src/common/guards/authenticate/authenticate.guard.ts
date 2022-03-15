@@ -19,7 +19,7 @@ export class AuthenticateGuard implements CanActivate {
       const firebaseUser = {
         email: decodedToken.email,
         name: decodedToken.name,
-        picture: decodedToken.picture,
+        avatarUrl: decodedToken.picture,
         uid: decodedToken.uid,
       };
 
