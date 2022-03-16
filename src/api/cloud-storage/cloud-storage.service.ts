@@ -9,37 +9,36 @@ export class CloudStorageService {
 
   constructor() {
     this.storage = new Storage({
-      projectId: process.env.FIREBASE_PROJECT_ID,
+      projectId: process.env.STORAGE_PROJECT_ID,
       credentials: {
-        client_email: process.env.FIREBASE_CLIENT_EMAIL,
-        private_key: process.env.FIREBASE_PRIVATE_KEY,
+        client_email: process.env.STORAGE_CLIENT_EMAIL,
+        private_key: process.env.STORAGE_PRIVATE_KEY,
       },
     });
-    this.bucket = this.storage.bucket('qin-todo-backend');
+    this.bucket = this.storage.bucket(process.env.STORAGE_MEDIA_BUCKET);
   }
 
-  private setFilename(uploadedFile): string {
+  private setFilePath(uploadedFile): string {
     const fileName = parse(uploadedFile.originalname);
-    return `${fileName.name}-${Date.now()}${fileName.ext}`
+    return `avatar/${fileName.name}-${Date.now()}${fileName.ext}`
       .replace(/^\.+/g, '')
       .replace(/^\/+/g, '')
       .replace(/\r|\n/g, '_');
   }
 
   async uploadFile(uploadedFile): Promise<any> {
-    const fileName = this.setFilename(uploadedFile);
-    const file = this.storage.bucket(this.bucket.name).file(fileName);
+    const filePath = this.setFilePath(uploadedFile);
+    const file = this.storage.bucket(this.bucket.name).file(filePath);
 
     try {
       await file.save(uploadedFile.buffer, {
         contentType: uploadedFile.mimetype,
       });
+      // 公開ファイルにする
+      await file.makePublic();
     } catch (error) {
       throw new BadRequestException(error?.message);
     }
-    return {
-      ...file.metadata,
-      publicUrl: `https://storage.googleapis.com/${this.bucket}/${file.name}`,
-    };
+    return `https://storage.googleapis.com/${this.bucket.name}/${file.name}`;
   }
 }
