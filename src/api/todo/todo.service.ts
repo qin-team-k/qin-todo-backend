@@ -15,6 +15,7 @@ export class TodoService {
     // todoStatusをキーにした、todoIdsを取得
     const todoOrders = await this.findOrdersByUserId(userId);
     const todoIdsMap = this.getTodoIdsMap(todoOrders);
+
     // todoStatusをキーにした、todoの配列を取得
     const todos = await this.findTodoByUserId(userId);
     const todosMap = this.getTodosMap(todos, todoIdsMap);
@@ -24,12 +25,6 @@ export class TodoService {
       TOMORROW: todosMap.get(TodoStatus.TOMORROW),
       NEXT: todosMap.get(TodoStatus.NEXT),
     };
-  }
-
-  async findById(todoId: number): Promise<Todo> {
-    return await this.prisma.todo.findUnique({
-      where: { id: todoId },
-    });
   }
 
   // Todo作成
@@ -273,6 +268,13 @@ export class TodoService {
         },
       });
     }
+  }
+
+  // Todoを1件取得
+  async findTodoById(todoId: number): Promise<Todo> {
+    return await this.prisma.todo.findUnique({
+      where: { id: todoId },
+    });
   }
 
   // todoStatusをキーにした、todoの配列を取得
