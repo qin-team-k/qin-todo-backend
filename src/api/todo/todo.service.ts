@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Todo, TodoStatus } from '@prisma/client';
+import { Todo, TodoOrder, TodoStatus } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CreateTodoDto } from './dto/create-todo.dto';
 import { UpdateTodoOrderDto } from './dto/update-todo-order.dto';
@@ -12,62 +12,17 @@ export class TodoService {
 
   // Todo一覧取得
   async findAll(userId: string): Promise<FindAllRes> {
-    const todoOrders = await this.prisma.todoOrder.findMany({
-      where: { userId },
-    });
-
-    const todayTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === TodoStatus.TODAY,
-    );
-    const tomorrowTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === TodoStatus.TOMORROW,
-    );
-    const nextTodoOrder = todoOrders.filter(
-      (todoOrder) => todoOrder.status === TodoStatus.NEXT,
-    );
-
-    let todayTodoIds: string[];
-    let tomorrowTodoIds: string[];
-    let nextTodoIds: string[];
-
-    if (todayTodoOrder[0].todoIds) {
-      todayTodoIds = todayTodoOrder[0].todoIds.split(',');
-    } else {
-      todayTodoIds = [];
-    }
-
-    if (tomorrowTodoOrder[0].todoIds) {
-      tomorrowTodoIds = tomorrowTodoOrder[0].todoIds.split(',');
-    } else {
-      tomorrowTodoIds = [];
-    }
-
-    if (nextTodoOrder[0].todoIds) {
-      nextTodoIds = nextTodoOrder[0].todoIds.split(',');
-    } else {
-      nextTodoIds = [];
-    }
-
-    const todos = await this.prisma.todo.findMany({
-      where: {
-        userId,
-      },
-    });
-
-    const TOMORROW = tomorrowTodoIds.map((id) =>
-      todos.find((todo) => todo.id === Number(id)),
-    );
-    const NEXT = nextTodoIds.map((id) =>
-      todos.find((todo) => todo.id === Number(id)),
-    );
-    const TODAY = todayTodoIds.map((id) =>
-      todos.find((todo) => todo.id === Number(id)),
-    );
+    // todoStatusをキーにした、todoIdsを取得
+    const todoOrders = await this.findOrdersByUserId(userId);
+    const todoIdsMap = this.getTodoIdsMap(todoOrders);
+    // todoStatusをキーにした、todoの配列を取得
+    const todos = await this.findTodoByUserId(userId);
+    const todosMap = this.getTodosMap(todos, todoIdsMap);
 
     return {
-      TODAY,
-      TOMORROW,
-      NEXT,
+      TODAY: todosMap.get(TodoStatus.TODAY),
+      TOMORROW: todosMap.get(TodoStatus.TOMORROW),
+      NEXT: todosMap.get(TodoStatus.NEXT),
     };
   }
 
@@ -344,5 +299,47 @@ export class TodoService {
         },
       });
     }
+  }
+
+  // todoStatusをキーにした、todoの配列を取得
+  private getTodosMap(
+    todos: Todo[],
+    todoIdsMap: Map<TodoStatus, number[]>,
+  ): Map<TodoStatus, Todo[]> {
+    const todosMap = new Map<TodoStatus, Todo[]>();
+    todoIdsMap.forEach((todoIds, status) => {
+      todosMap.set(
+        status,
+        todoIds.map((id) => todos.find((todo) => todo.id === id)),
+      );
+    });
+    return todosMap;
+  }
+
+  // todoStatusをキーにした、Idの配列を取得
+  private getTodoIdsMap(todoOrders: TodoOrder[]): Map<TodoStatus, number[]> {
+    const todoIdsMap = new Map<TodoStatus, number[]>();
+    (Object.keys(TodoStatus) as TodoStatus[]).forEach((status) => {
+      todoIdsMap.set(
+        status,
+        todoOrders
+          .find((todoOrder) => todoOrder.status === status)
+          .todoIds?.split(',')
+          ?.map((id) => Number(id)) ?? [],
+      );
+    });
+    return todoIdsMap;
+  }
+
+  private async findTodoByUserId(userId: string): Promise<Todo[]> {
+    return await this.prisma.todo.findMany({
+      where: { userId },
+    });
+  }
+
+  private async findOrdersByUserId(userId: string): Promise<TodoOrder[]> {
+    return await this.prisma.todoOrder.findMany({
+      where: { userId },
+    });
   }
 }
