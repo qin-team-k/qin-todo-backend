@@ -15,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '@prisma/client';
 import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
+import { multerOptions } from 'src/utils/file-upload.utils';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -56,7 +57,7 @@ export class UserController {
 
   @Version('1')
   @Put(':userId/avatar')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   async updateAvatar(
     @GetCurrentUser() user: User,
     @Param('userId', ParseUUIDPipe) userId: string,
