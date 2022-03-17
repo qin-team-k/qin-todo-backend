@@ -20,9 +20,8 @@ export class CloudStorageService {
 
   private setFilePath(uploadedFile): string {
     const fileName = parse(uploadedFile.originalname);
-    return `avatar/${fileName.name}-${Date.now()}${fileName.ext}`
-      .replace(/^\.+/g, '')
-      .replace(/^\/+/g, '')
+    return `avatar/${fileName.name}_${Date.now()}${fileName.ext}`
+      .replace(/\s/g, '_')
       .replace(/\r|\n/g, '_');
   }
 
