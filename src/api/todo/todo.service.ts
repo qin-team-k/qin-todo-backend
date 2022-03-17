@@ -30,13 +30,11 @@ export class TodoService {
   // Todo作成
   // FIXME トランザクションを追加
   async create(userId: string, createTodoDto: CreateTodoDto): Promise<Todo> {
-    const todo = await this.prisma.todo.create({
-      data: {
-        userId,
-        status: createTodoDto.status,
-        content: createTodoDto.content,
-      },
-    });
+    const todo = await this.createTodo(
+      userId,
+      createTodoDto.content,
+      createTodoDto.status,
+    );
 
     // todoOrderを取得して、作成したtodoを末尾に追加
     const todoOrders = await this.findOrderByUnique(userId, todo.status);
@@ -55,58 +53,35 @@ export class TodoService {
   // Todo複製
   // FIXME トランザクションを追加
   async duplicate(userId: string, todoId: number): Promise<Todo> {
-    const todo = await this.prisma.todo.findUnique({
-      where: { id: todoId },
-    });
-    const duplicatedTodo = await this.prisma.todo.create({
-      data: {
-        userId,
-        status: todo.status,
-        content: todo.content,
-      },
-    });
+    const originalTodo = await this.findTodoById(todoId);
+    const duplicatedTodo = await this.createTodo(
+      userId,
+      originalTodo.content,
+      originalTodo.status,
+    );
 
-    const todoOrders = await this.prisma.todoOrder.findUnique({
-      where: {
-        userId_status: {
-          userId,
-          status: todo.status,
-        },
-      },
-    });
-    const currentTodoIds = todoOrders.todoIds.split(',');
-    const todoIdIndex = currentTodoIds.indexOf(String(todo.id));
-    currentTodoIds.splice(todoIdIndex + 1, 0, String(duplicatedTodo.id));
-    await this.prisma.todoOrder.update({
-      where: {
-        userId_status: {
-          userId,
-          status: todo.status,
-        },
-      },
-      data: {
-        todoIds: currentTodoIds.join(','),
-      },
-    });
+    // todoOrderを取得して、複製元のtodoの後ろに追加
+    const todoOrder = await this.findOrderByUnique(userId, originalTodo.status);
+    const originalTodoIds = todoOrder.todoIds.split(',');
+    const originalTodoIndex = originalTodoIds.indexOf(String(originalTodo.id));
+    const todoIdJoin = this.addTodoOrderId(
+      originalTodoIds,
+      duplicatedTodo.id,
+      originalTodoIndex + 1,
+    ).join(',');
+
+    // todoOrderを更新
+    todoOrder.todoIds = todoIdJoin;
+    await this.updateTodoOrder(todoOrder);
 
     return duplicatedTodo;
   }
 
   // 完了・未完了の切り替え
   async toggleDone(todoId: number): Promise<Todo> {
-    const todo = await this.prisma.todo.findUnique({
-      where: {
-        id: todoId,
-      },
-    });
-    return this.prisma.todo.update({
-      where: {
-        id: todoId,
-      },
-      data: {
-        done: !todo.done,
-      },
-    });
+    const todo = await this.findTodoById(todoId);
+    todo.done = !todo.done;
+    return this.updateTodo(todo);
   }
 
   // Todo並び替え
@@ -114,100 +89,33 @@ export class TodoService {
   async updateOrder(
     userId: string,
     todoId: number,
-    todo: UpdateTodoOrderDto,
+    todoOrderDto: UpdateTodoOrderDto,
   ): Promise<void> {
-    // 現在のTodoを取得
-    const currentTodo = await this.prisma.todo.findUnique({
-      where: { id: todoId },
-    });
+    // 変更対象のTodoを取得
+    const targetTodo = await this.findTodoById(todoId);
 
-    // 現在のtodoOrderを取得
-    const currentTodoOrders = await this.prisma.todoOrder.findUnique({
-      where: {
-        userId_status: {
-          userId,
-          status: currentTodo.status,
-        },
-      },
-    });
+    // 移動元・移動先のTodoOrderを取得
+    const fromOrder = await this.findOrderByUnique(userId, targetTodo.status);
+    const toOrder = await this.findOrderByUnique(userId, todoOrderDto.status);
 
-    // 文字配列に変換し配列から削除
-    const deletedTodoIds = currentTodoOrders.todoIds
+    // todoStatusを更新
+    targetTodo.status = todoOrderDto.status;
+    await this.updateTodo(targetTodo);
+
+    // 移動元から削除
+    const deletedTodoIds = fromOrder.todoIds
       .split(',')
       .filter((id) => id !== String(todoId));
-    const deletedTodoOrder = await this.prisma.todoOrder.update({
-      where: {
-        userId_status: {
-          userId,
-          status: currentTodo.status,
-        },
-      },
-      data: {
-        todoIds: deletedTodoIds.join(','),
-      },
-    });
+    fromOrder.todoIds =
+      deletedTodoIds.length != 0 ? deletedTodoIds.join(',') : null;
+    await this.updateTodoOrder(fromOrder);
 
-    if (!deletedTodoOrder.todoIds) {
-      await this.prisma.todoOrder.update({
-        where: {
-          userId_status: {
-            userId,
-            status: currentTodo.status,
-          },
-        },
-        data: {
-          todoIds: null,
-        },
-      });
-    }
-
-    // Todoを更新
-    await this.prisma.todo.update({
-      where: { id: todoId },
-      data: { status: todo.status },
-    });
-
-    // 更新先のtodoOrderを取得
-    const updateTodoOrders = await this.prisma.todoOrder.findUnique({
-      where: {
-        userId_status: {
-          userId,
-          status: todo.status,
-        },
-      },
-    });
-
-    // FIXME リファクタ
-    // 更新先のtodoOrderがnullかどうか
-    if (updateTodoOrders.todoIds) {
-      const newTodoIds = updateTodoOrders.todoIds.split(',');
-      newTodoIds.splice(todo.index, 0, String(todoId));
-
-      await this.prisma.todoOrder.update({
-        where: {
-          userId_status: {
-            userId,
-            status: todo.status,
-          },
-        },
-        data: {
-          todoIds: newTodoIds.join(','),
-        },
-      });
-    } else {
-      updateTodoOrders.todoIds = String(todoId);
-      await this.prisma.todoOrder.update({
-        where: {
-          userId_status: {
-            userId,
-            status: todo.status,
-          },
-        },
-        data: {
-          todoIds: updateTodoOrders.todoIds,
-        },
-      });
-    }
+    // 移動先に追加
+    const todoIds: string[] | null = toOrder.todoIds?.split(',');
+    toOrder.todoIds = todoIds
+      ? this.addTodoOrderId(todoIds, todoId, todoOrderDto.index).join(',')
+      : `${todoId}`;
+    await this.updateTodoOrder(toOrder);
   }
 
   // Todo内容更新
@@ -277,6 +185,17 @@ export class TodoService {
     });
   }
 
+  async findOrderByUnique(userId: string, status: TodoStatus) {
+    return await this.prisma.todoOrder.findUnique({
+      where: {
+        userId_status: {
+          userId,
+          status,
+        },
+      },
+    });
+  }
+
   // todoStatusをキーにした、todoの配列を取得
   private getTodosMap(
     todos: Todo[],
@@ -314,8 +233,33 @@ export class TodoService {
     index: number,
   ): string[] {
     const copy = [...todoIds];
-    copy.splice(index || todoIds.length, 0, String(todoId));
+    copy.splice(index, 0, String(todoId));
     return copy;
+  }
+
+  private async createTodo(
+    userId: string,
+    content: string,
+    status: TodoStatus,
+  ): Promise<Todo> {
+    return await this.prisma.todo.create({
+      data: {
+        userId,
+        content,
+        status,
+      },
+    });
+  }
+
+  private async updateTodo(todo: Todo): Promise<Todo> {
+    return await this.prisma.todo.update({
+      where: { id: todo.id },
+      data: {
+        content: todo.content,
+        status: todo.status,
+        done: todo.done,
+      },
+    });
   }
 
   private async findTodoByUserId(userId: string): Promise<Todo[]> {
@@ -327,17 +271,6 @@ export class TodoService {
   private async findOrdersByUserId(userId: string): Promise<TodoOrder[]> {
     return await this.prisma.todoOrder.findMany({
       where: { userId },
-    });
-  }
-
-  private async findOrderByUnique(userId: string, status: TodoStatus) {
-    return await this.prisma.todoOrder.findUnique({
-      where: {
-        userId_status: {
-          userId,
-          status,
-        },
-      },
     });
   }
 
