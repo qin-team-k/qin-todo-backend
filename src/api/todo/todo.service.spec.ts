@@ -180,6 +180,31 @@ describe('UpdateOrder', () => {
     expect(updatedTodoAll.TOMORROW[0].id).toEqual(todoId);
   });
 
+  it('Normal case: Update order when updated no todo', async () => {
+    const todoId = 13;
+
+    // update前のデータを確認
+    const todo = await service.findTodoById(todoId);
+    const todoAll = await service.findAll(userId);
+    expect(todo.status).toEqual(TodoStatus.TODAY);
+    expect(todoAll.TODAY[0].id).toEqual(todoId);
+
+    // update
+    await service.updateOrder(userId, todoId, {
+      status: TodoStatus.TOMORROW,
+      index: 0,
+    });
+
+    // // update後のデータを確認
+    const updatedTodo = await service.findTodoById(todoId);
+    const todayOrder = await service.findOrderByUnique(
+      userId,
+      TodoStatus.TODAY,
+    );
+    expect(updatedTodo.status).toEqual(TodoStatus.TOMORROW);
+    expect(todayOrder.todoIds).toBeNull();
+  });
+
   //TODO 未実装で失敗するためコメントアウトしておく
   // it('Abnormal case: When todo updated by other user, should Forbidden', async () => {
   //   const todoId = 1;
