@@ -13,7 +13,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from '@prisma/client';
-import { GetAvatarImage } from 'src/common/decorators/avatar-image.decorator';
 import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
 import { UserService } from './user.service';
@@ -61,7 +60,6 @@ export class UserController {
   async updateAvatar(
     @GetCurrentUser() user: User,
     @Param('userId', ParseUUIDPipe) userId: string,
-    @GetAvatarImage() avatarImage,
     @UploadedFile() file: Express.Multer.File,
   ): Promise<any> {
     return this.userService.updateAvatarUrl(user.id, userId, file);
