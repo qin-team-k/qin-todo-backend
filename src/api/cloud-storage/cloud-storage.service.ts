@@ -18,15 +18,19 @@ export class CloudStorageService {
     this.bucket = this.storage.bucket(process.env.STORAGE_MEDIA_BUCKET);
   }
 
-  private setFilePath(uploadedFile): string {
+  private setFilePath(
+    uploadedFile: Express.Multer.File,
+    userId: string,
+  ): string {
     const fileName = parse(uploadedFile.originalname);
-    return `avatar/${fileName.name}_${Date.now()}${fileName.ext}`
-      .replace(/\s/g, '_')
-      .replace(/\r|\n/g, '_');
+    return `avatar/${userId}/${Date.now()}${fileName.ext}`;
   }
 
-  async uploadFile(uploadedFile): Promise<any> {
-    const filePath = this.setFilePath(uploadedFile);
+  async uploadFile(
+    uploadedFile: Express.Multer.File,
+    userId: string,
+  ): Promise<string> {
+    const filePath = this.setFilePath(uploadedFile, userId);
     const file = this.storage.bucket(this.bucket.name).file(filePath);
 
     try {

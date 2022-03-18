@@ -60,7 +60,11 @@ export class UserService {
     });
   }
 
-  async updateUsername(userId: string, paramUserId, username: string) {
+  async updateUsername(
+    userId: string,
+    paramUserId,
+    username: string,
+  ): Promise<User> {
     if (userId !== paramUserId) {
       throw new ForbiddenException('Access denied');
     }
@@ -70,11 +74,15 @@ export class UserService {
     });
   }
 
-  async updateAvatarUrl(userId: string, paramUserId, file) {
+  async updateAvatarUrl(
+    userId: string,
+    paramUserId: string,
+    file: Express.Multer.File,
+  ): Promise<User> {
     if (userId !== paramUserId) {
       throw new ForbiddenException('Access denied');
     }
-    const avatarUrl = await this.cloudStorageService.uploadFile(file);
+    const avatarUrl = await this.cloudStorageService.uploadFile(file, userId);
     return await this.prisma.user.update({
       where: { id: userId },
       data: { avatarUrl },
