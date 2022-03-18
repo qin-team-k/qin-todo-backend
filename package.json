@@ -19,11 +19,11 @@
     "docker:down": "docker-compose -f ./docker/docker-compose.yml -p qin-todo down",
     "docker:reset": "yarn docker:down && yarn docker:up",
     "migrate": "yarn prisma db push && npx ts-node prisma/seed/start.ts",
-    "test": "yarn docker:reset && sleep 10 && yarn migrate && jest",
-    "test:watch": "yarn docker:reset && sleep 10 && yarn migrate && jest --watch",
-    "test:cov": "yarn docker:reset && sleep 10 && yarn migrate && jest --coverage",
+    "test": "yarn migrate && jest --runInBand",
+    "test:watch": "jest --watch --runInBand",
+    "test:cov": "jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "yarn docker:reset && sleep 10 && yarn migrate && jest --config ./test/jest-e2e.json"
+    "test:e2e": "yarn migrate && jest --config ./test/jest-e2e.json"
   },
   "prisma": {
     "seed": "ts-node prisma/seed/start.ts"
