@@ -1,16 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TodoStatus } from '@prisma/client';
+import { resetDatabase } from 'src/common/helper/resetDatabase';
 import { PrismaService } from 'src/prisma.service';
 import { TodoService } from './todo.service';
 
 let service: TodoService;
 
-beforeEach(async () => {
+beforeAll(async () => {
   const module: TestingModule = await Test.createTestingModule({
     providers: [TodoService, PrismaService],
   }).compile();
 
   service = module.get<TodoService>(TodoService);
+});
+
+beforeEach(async () => {
+  await resetDatabase();
 });
 
 const userId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
@@ -98,6 +103,12 @@ describe('Create', () => {
 describe('Duplicate', () => {
   it('Normal case: Duplicate todo', async () => {
     const todoId = 13;
+    // todoを1件作成
+    const todo = {
+      status: TodoStatus.TODAY,
+      content: 'テスト',
+    };
+    await service.create(userId, todo);
 
     // duplicate前のデータを確認
     const beforeDuplicate = await service.findAll(userId);
@@ -142,6 +153,13 @@ describe('ToggleDone', () => {
 describe('UpdateOrder', () => {
   it('Normal case: Update order', async () => {
     const todoId = 13;
+    // todoを1件作成
+    const createTodo = {
+      status: TodoStatus.TODAY,
+      content: 'テスト',
+    };
+    await service.create(userId, createTodo);
+
     // update前のデータを確認
     const todo = await service.findById(todoId);
     const todoAll = await service.findAll(userId);
@@ -158,13 +176,8 @@ describe('UpdateOrder', () => {
     const updatedTodo = await service.findById(todoId);
     const updatedTodoAll = await service.findAll(userId);
     expect(updatedTodo.status).toEqual(TodoStatus.TOMORROW);
+    expect(updatedTodoAll.TODAY[0].id).not.toEqual(todoId);
     expect(updatedTodoAll.TOMORROW[0].id).toEqual(todoId);
-
-    // order戻す
-    await service.updateOrder(userId, todoId, {
-      status: TodoStatus.TODAY,
-      index: 0,
-    });
   });
 
   //TODO 未実装で失敗するためコメントアウトしておく
@@ -210,6 +223,13 @@ describe('UpdateContent', () => {
 describe('Delete', () => {
   it('Normal case: Delete todo', async () => {
     const todoId = 13;
+    // todoを1件作成
+    const createTodo = {
+      status: TodoStatus.TODAY,
+      content: 'テスト',
+    };
+    await service.create(userId, createTodo);
+
     // delete前のデータを確認
     const beforeDelete = await service.findById(todoId);
     const beforeDeleteAll = await service.findAll(userId);
