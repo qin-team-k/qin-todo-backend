@@ -37,8 +37,8 @@ export class TodoService {
     );
 
     // todoOrderを取得して、作成したtodoを末尾に追加
-    const todoOrders = await this.findOrderByUnique(userId, todo.status);
-    const todoIds: string[] | null = todoOrders.todoIds?.split(',');
+    const todoOrder = await this.findOrderByUnique(userId, todo.status);
+    const todoIds: string[] | null = todoOrder.todoIds?.split(',');
     const addedTodoIds: string = this.addOrderId(
       todoIds,
       todo.id,
@@ -46,8 +46,8 @@ export class TodoService {
     );
 
     // todoOrderを更新
-    todoOrders.todoIds = addedTodoIds;
-    await this.updateTodoOrder(todoOrders);
+    todoOrder.todoIds = addedTodoIds;
+    await this.updateTodoOrder(todoOrder);
 
     return todo;
   }
