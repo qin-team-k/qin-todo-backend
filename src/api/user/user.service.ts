@@ -62,7 +62,7 @@ export class UserService {
 
   async updateUsername(
     userId: string,
-    paramUserId,
+    paramUserId: string,
     username: string,
   ): Promise<User> {
     if (userId !== paramUserId) {
