@@ -7,6 +7,7 @@ import { UserService } from './user.service';
 
 describe('UserService', () => {
   let service: UserService;
+  let prisma: PrismaService;
 
   const createUserDto = {
     email: 'tom@example.com',
@@ -91,6 +92,7 @@ describe('UserService', () => {
       .compile();
 
     service = module.get(UserService);
+    prisma = module.get(PrismaService);
   });
 
   it('can create an instance of user service', async () => {
