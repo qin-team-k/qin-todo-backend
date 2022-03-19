@@ -97,6 +97,32 @@ describe('Create', () => {
     ).TODAY.slice(-1)[0];
     expect(lastIndexTodo.id).toEqual(todoId);
   });
+
+  it(`Normal case: Create todo when user didn't have todo`, async () => {
+    const todoId = 16;
+    const todo = {
+      status: TodoStatus.TODAY,
+      content: 'テスト',
+    };
+    const noTodoUser = '7d564bce-2b98-4a86-b5b3-a942e6241584';
+
+    // create前のデータを確認
+    const beforeCreate = await service.findTodoById(todoId);
+    expect(beforeCreate).toBeNull();
+
+    // create
+    await service.create(noTodoUser, todo);
+
+    // create後のデータを確認
+    const afterCreate = await service.findTodoById(todoId);
+    expect(afterCreate.content).toEqual('テスト');
+
+    // create後のデータがorderの最後に追加されているか
+    const lastIndexTodo = await (
+      await service.findAll(noTodoUser)
+    ).TODAY.slice(-1)[0];
+    expect(lastIndexTodo.id).toEqual(todoId);
+  });
 });
 
 // duplicateメソッドのテスト
