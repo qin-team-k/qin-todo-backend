@@ -42,7 +42,7 @@ export class TodoService {
     const addedTodoIds: string = this.addOrderId(
       todoIds,
       todo.id,
-      todoIds.length,
+      todoIds?.length,
     );
 
     // todoOrderを更新
