@@ -107,7 +107,12 @@ describe('Create', () => {
     const noTodoUser = '7d564bce-2b98-4a86-b5b3-a942e6241584';
 
     // create前のデータを確認
+    const beforeCreateOrder = await service.findOrderByUnique(
+      noTodoUser,
+      TodoStatus.TODAY,
+    );
     const beforeCreate = await service.findTodoById(todoId);
+    expect(beforeCreateOrder.todoIds).toBeNull();
     expect(beforeCreate).toBeNull();
 
     // create
