@@ -29,9 +29,34 @@ describe('UserService', () => {
 
   beforeEach(async () => {
     // mockのUserサービスを作成
+    // const mockUserService: Partial<UserService> = {
+    //   initUser: jest.fn((createUserDto: CreateUserDto) =>
+    //     Promise.resolve({
+    //       id: '24b7282f-9d30-450b-8383-758ec0506b4d',
+    //       uid: createUserDto.uid,
+    //       username: createUserDto.name,
+    //       email: createUserDto.email,
+    //       avatarUrl: createUserDto.avatarUrl,
+    //       createdAt,
+    //       updatedAt,
+    //     }),
+    //   ),
+    //   updateUsername: jest.fn(
+    //     (userId: string, paramUserId: string, username: string) =>
+    //       Promise.resolve({
+    //         id: userId,
+    //         uid: createUserDto.uid,
+    //         username,
+    //         email: createUserDto.email,
+    //         avatarUrl: createUserDto.avatarUrl,
+    //         createdAt,
+    //         updatedAt,
+    //       }),
+    //   ),
+    // };
     const mockUserService: Partial<UserService> = {
-      initUser: jest.fn((createUserDto: CreateUserDto) =>
-        Promise.resolve({
+      initUser: jest.fn().mockImplementation((createUserDto: CreateUserDto) => {
+        return Promise.resolve({
           id: '24b7282f-9d30-450b-8383-758ec0506b4d',
           uid: createUserDto.uid,
           username: createUserDto.name,
@@ -39,33 +64,31 @@ describe('UserService', () => {
           avatarUrl: createUserDto.avatarUrl,
           createdAt,
           updatedAt,
-        }),
-      ),
-      updateUsername: jest.fn(
-        (userId: string, paramUserId: string, username: string) =>
-          Promise.resolve({
-            id: userId,
-            uid: createUserDto.uid,
-            username,
-            email: createUserDto.email,
-            avatarUrl: createUserDto.avatarUrl,
-            createdAt,
-            updatedAt,
-          }),
-      ),
+        });
+      }),
+      updateUsername: jest
+        .fn()
+        .mockImplementation(
+          (userId: string, paramUserId: string, username: string) => {
+            return Promise.resolve({
+              id: userId,
+              uid: createUserDto.uid,
+              username,
+              email: createUserDto.email,
+              avatarUrl: createUserDto.avatarUrl,
+              createdAt,
+              updatedAt,
+            });
+          },
+        ),
     };
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        PrismaService,
-        CloudStorageService,
-        UserService,
-        {
-          provide: UserService,
-          useValue: mockUserService,
-        },
-      ],
-    }).compile();
+      providers: [PrismaService, CloudStorageService, UserService],
+    })
+      .overrideProvider(UserService)
+      .useValue(mockUserService)
+      .compile();
 
     service = module.get(UserService);
   });
@@ -88,7 +111,7 @@ describe('UserService', () => {
   it('Normal case: throws an error if userId and paramUserId is not equal when update username', async () => {
     const userId = '24b7282f-9d30-450b-8383-758ec0506b4d';
     const paramUserId = '123';
-    const username = 'Jane Doe';
+    const username = 'Bruno Mars';
 
     await expect(
       service.updateUsername(userId, paramUserId, username),
