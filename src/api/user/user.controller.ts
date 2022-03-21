@@ -67,7 +67,7 @@ export class UserController {
     @Param('userId', ParseUUIDPipe) userId: string,
     @UploadedFile() avatarImage: Express.Multer.File,
   ): Promise<any> {
-    return this.userService.updateAvatarUrl(user.id, userId, avatarImage);
+    return this.userService.uploadAvatarImage(user.id, userId, avatarImage);
   }
 
   /**

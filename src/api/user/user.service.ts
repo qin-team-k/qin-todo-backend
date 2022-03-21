@@ -74,7 +74,7 @@ export class UserService {
     });
   }
 
-  async updateAvatarUrl(
+  async uploadAvatarImage(
     userId: string,
     paramUserId: string,
     file: Express.Multer.File,
