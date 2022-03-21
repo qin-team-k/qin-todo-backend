@@ -66,7 +66,9 @@ export class UserService {
     username: string,
   ): Promise<User> {
     if (userId !== paramUserId) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException(
+        'Access denied: The userId obtained during authentication and the param userId provided are different values.',
+      );
     }
     return await this.prisma.user.update({
       where: { id: userId },
@@ -80,7 +82,9 @@ export class UserService {
     file: Express.Multer.File,
   ): Promise<User> {
     if (userId !== paramUserId) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException(
+        'Access denied: The userId obtained during authentication and the param userId provided are different values.',
+      );
     }
     const avatarUrl = await this.cloudStorageService.uploadImage(file, userId);
     return await this.prisma.user.update({
