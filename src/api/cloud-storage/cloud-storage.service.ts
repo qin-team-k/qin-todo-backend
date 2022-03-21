@@ -18,16 +18,13 @@ export class CloudStorageService {
     this.bucket = this.storage.bucket(process.env.STORAGE_MEDIA_BUCKET);
   }
 
-  private setFileDetail(
+  private setFilePath(
     uploadedFile: Express.Multer.File,
     userId: string,
-  ): { filePath: string; filename: string } {
+  ): string {
     const currentFilename = parse(uploadedFile.originalname);
     const newFilename = `${userId}/${Date.now()}${currentFilename.ext}`;
-    return {
-      filePath: `avatar/${newFilename}`,
-      filename: newFilename,
-    };
+    return `avatar/${newFilename}`;
   }
 
   private async saveImageToStorage(
@@ -50,9 +47,10 @@ export class CloudStorageService {
     uploadedFile: Express.Multer.File,
     userId: string,
   ): Promise<string> {
-    const fileDetail = this.setFileDetail(uploadedFile, userId);
-    await this.saveImageToStorage(uploadedFile, fileDetail.filePath);
+    const filePath = this.setFilePath(uploadedFile, userId);
+    await this.saveImageToStorage(uploadedFile, filePath);
+    const STORAGE_URL = process.env.STORAGE_URL;
 
-    return `https://storage.googleapis.com/${this.bucket.name}/${fileDetail.filename}`;
+    return `${STORAGE_URL}/${this.bucket.name}/${filePath}`;
   }
 }
