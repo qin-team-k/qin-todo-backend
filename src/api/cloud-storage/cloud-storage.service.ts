@@ -22,8 +22,8 @@ export class CloudStorageService {
     uploadedFile: Express.Multer.File,
     userId: string,
   ): string {
-    const currentFilename = parse(uploadedFile.originalname);
-    const newFilename = `${userId}/${Date.now()}${currentFilename.ext}`;
+    const fileExtension = parse(uploadedFile.originalname).ext;
+    const newFilename = `${userId}/${Date.now()}${fileExtension}`;
     return `avatar/${newFilename}`;
   }
 
