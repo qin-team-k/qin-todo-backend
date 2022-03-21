@@ -148,7 +148,10 @@ export class TodoService {
     });
   }
 
-  async findOrderByUnique(userId: string, status: TodoStatus) {
+  async findOrderByUnique(
+    userId: string,
+    status: TodoStatus,
+  ): Promise<TodoOrder> {
     return await this.prisma.todoOrder.findUnique({
       where: {
         userId_status: {
@@ -255,7 +258,7 @@ export class TodoService {
     });
   }
 
-  private async updateTodoOrder(todoOrder: TodoOrder) {
+  private async updateTodoOrder(todoOrder: TodoOrder): Promise<TodoOrder> {
     return await this.prisma.todoOrder.update({
       where: {
         userId_status: {
