@@ -18,21 +18,23 @@ export class CloudStorageService {
     this.bucket = this.storage.bucket(process.env.STORAGE_MEDIA_BUCKET);
   }
 
-  private setFilePath(
+  private setFileDetail(
     uploadedFile: Express.Multer.File,
     userId: string,
-  ): string {
-    const fileName = parse(uploadedFile.originalname);
-    return `avatar/${userId}/${Date.now()}${fileName.ext}`;
+  ): { filePath: string; filename: string } {
+    const currentFilename = parse(uploadedFile.originalname);
+    const newFilename = `${userId}/${Date.now()}${currentFilename.ext}`;
+    return {
+      filePath: `avatar/${newFilename}`,
+      filename: newFilename,
+    };
   }
 
-  async uploadFile(
+  private async saveImageToStorage(
     uploadedFile: Express.Multer.File,
-    userId: string,
-  ): Promise<string> {
-    const filePath = this.setFilePath(uploadedFile, userId);
+    filePath: string,
+  ): Promise<void> {
     const file = this.storage.bucket(this.bucket.name).file(filePath);
-
     try {
       await file.save(uploadedFile.buffer, {
         contentType: uploadedFile.mimetype,
@@ -42,6 +44,15 @@ export class CloudStorageService {
     } catch (error) {
       throw new BadRequestException(error?.message);
     }
-    return `https://storage.googleapis.com/${this.bucket.name}/${file.name}`;
+  }
+
+  async uploadImage(
+    uploadedFile: Express.Multer.File,
+    userId: string,
+  ): Promise<string> {
+    const fileDetail = this.setFileDetail(uploadedFile, userId);
+    await this.saveImageToStorage(uploadedFile, fileDetail.filePath);
+
+    return `https://storage.googleapis.com/${this.bucket.name}/${fileDetail.filename}`;
   }
 }

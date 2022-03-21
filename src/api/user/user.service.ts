@@ -82,7 +82,7 @@ export class UserService {
     if (userId !== paramUserId) {
       throw new ForbiddenException('Access denied');
     }
-    const avatarUrl = await this.cloudStorageService.uploadFile(file, userId);
+    const avatarUrl = await this.cloudStorageService.uploadImage(file, userId);
     return await this.prisma.user.update({
       where: { id: userId },
       data: { avatarUrl },
