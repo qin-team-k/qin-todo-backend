@@ -16,6 +16,7 @@ import { User } from '@prisma/client';
 import { GetCurrentUser } from 'src/common/decorators/current-user.decorator';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
 import { multerOptions } from 'src/utils/file-upload.utils';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -44,10 +45,13 @@ export class UserController {
   async updateUser(
     @GetCurrentUser() user: User,
     @Param('userId', ParseUUIDPipe) userId: string,
-    @Body('username')
-    username: string,
+    @Body() updateUser: UpdateUserDto,
   ): Promise<User> {
-    return await this.userService.updateUsername(user.id, userId, username);
+    return await this.userService.updateUsername(
+      user.id,
+      userId,
+      updateUser.username,
+    );
   }
 
   /**
