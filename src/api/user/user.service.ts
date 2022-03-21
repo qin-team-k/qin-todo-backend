@@ -60,7 +60,7 @@ export class UserService {
     });
   }
 
-  async updateUsername(
+  async updateUser(
     userId: string,
     paramUserId: string,
     username: string,
