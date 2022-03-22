@@ -3,6 +3,7 @@ import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CloudStorageService } from '../cloud-storage/cloud-storage.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -63,7 +64,7 @@ export class UserService {
   async updateUser(
     userId: string,
     paramUserId: string,
-    username: string,
+    updateUserDto: UpdateUserDto,
   ): Promise<User> {
     if (userId !== paramUserId) {
       throw new ForbiddenException(
@@ -72,7 +73,7 @@ export class UserService {
     }
     return await this.prisma.user.update({
       where: { id: userId },
-      data: { username },
+      data: { username: updateUserDto.username },
     });
   }
 

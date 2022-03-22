@@ -45,13 +45,9 @@ export class UserController {
   async updateUser(
     @GetCurrentUser() user: User,
     @Param('userId', ParseUUIDPipe) userId: string,
-    @Body() updateUser: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ): Promise<User> {
-    return await this.userService.updateUser(
-      user.id,
-      userId,
-      updateUser.username,
-    );
+    return await this.userService.updateUser(user.id, userId, updateUserDto);
   }
 
   /**
