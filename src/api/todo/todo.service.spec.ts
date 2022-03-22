@@ -81,19 +81,50 @@ describe('Create', () => {
       content: 'テスト',
     };
     // create前のデータを確認
-    const beforeCreate = await service.findById(todoId);
+    const beforeCreate = await service.findTodoById(todoId);
     expect(beforeCreate).toBeNull();
 
     // create
     await service.create(userId, todo);
 
     // create後のデータを確認
-    const afterCreate = await service.findById(todoId);
+    const afterCreate = await service.findTodoById(todoId);
     expect(afterCreate.content).toEqual('テスト');
 
     // create後のデータがorderの最後に追加されているか
     const lastIndexTodo = await (
       await service.findAll(userId)
+    ).TODAY.slice(-1)[0];
+    expect(lastIndexTodo.id).toEqual(todoId);
+  });
+
+  it(`Normal case: Create todo when user didn't have todo`, async () => {
+    const todoId = 16;
+    const todo = {
+      status: TodoStatus.TODAY,
+      content: 'テスト',
+    };
+    const noTodoUser = '7d564bce-2b98-4a86-b5b3-a942e6241584';
+
+    // create前のデータを確認
+    const beforeCreateOrder = await service.findOrderByUnique(
+      noTodoUser,
+      TodoStatus.TODAY,
+    );
+    const beforeCreate = await service.findTodoById(todoId);
+    expect(beforeCreateOrder.todoIds).toBeNull();
+    expect(beforeCreate).toBeNull();
+
+    // create
+    await service.create(noTodoUser, todo);
+
+    // create後のデータを確認
+    const afterCreate = await service.findTodoById(todoId);
+    expect(afterCreate.content).toEqual('テスト');
+
+    // create後のデータがorderの最後に追加されているか
+    const lastIndexTodo = await (
+      await service.findAll(noTodoUser)
     ).TODAY.slice(-1)[0];
     expect(lastIndexTodo.id).toEqual(todoId);
   });
@@ -133,10 +164,10 @@ describe('Duplicate', () => {
 describe('ToggleDone', () => {
   it('Normal case: toggle todo is done', async () => {
     const todoId = 13;
-    const todo = await service.findById(todoId);
+    const todo = await service.findTodoById(todoId);
     expect(todo.done).toBeFalsy();
     await service.toggleDone(todoId);
-    const toggledTodo = await service.findById(todoId);
+    const toggledTodo = await service.findTodoById(todoId);
     expect(toggledTodo.done).toBeTruthy();
   });
 
@@ -161,7 +192,7 @@ describe('UpdateOrder', () => {
     await service.create(userId, createTodo);
 
     // update前のデータを確認
-    const todo = await service.findById(todoId);
+    const todo = await service.findTodoById(todoId);
     const todoAll = await service.findAll(userId);
     expect(todo.status).toEqual(TodoStatus.TODAY);
     expect(todoAll.TODAY[0].id).toEqual(todoId);
@@ -173,11 +204,36 @@ describe('UpdateOrder', () => {
     });
 
     // update後のデータを確認
-    const updatedTodo = await service.findById(todoId);
+    const updatedTodo = await service.findTodoById(todoId);
     const updatedTodoAll = await service.findAll(userId);
     expect(updatedTodo.status).toEqual(TodoStatus.TOMORROW);
     expect(updatedTodoAll.TODAY[0].id).not.toEqual(todoId);
     expect(updatedTodoAll.TOMORROW[0].id).toEqual(todoId);
+  });
+
+  it('Normal case: Update order when updated no todo', async () => {
+    const todoId = 13;
+
+    // update前のデータを確認
+    const todo = await service.findTodoById(todoId);
+    const todoAll = await service.findAll(userId);
+    expect(todo.status).toEqual(TodoStatus.TODAY);
+    expect(todoAll.TODAY[0].id).toEqual(todoId);
+
+    // update
+    await service.updateOrder(userId, todoId, {
+      status: TodoStatus.TOMORROW,
+      index: 0,
+    });
+
+    // // update後のデータを確認
+    const updatedTodo = await service.findTodoById(todoId);
+    const todayOrder = await service.findOrderByUnique(
+      userId,
+      TodoStatus.TODAY,
+    );
+    expect(updatedTodo.status).toEqual(TodoStatus.TOMORROW);
+    expect(todayOrder.todoIds).toBeNull();
   });
 
   //TODO 未実装で失敗するためコメントアウトしておく
@@ -198,14 +254,14 @@ describe('UpdateContent', () => {
     const todoId = 13;
     const content = 'めっちゃ走る';
     // 更新前のデータを確認
-    const beforeUpdate = await service.findById(todoId);
+    const beforeUpdate = await service.findTodoById(todoId);
     expect(beforeUpdate.content).not.toBe(content);
 
     // 更新
     await service.updateContent(todoId, { content });
 
     // 更新後のデータを確認
-    const afterUpdate = await service.findById(todoId);
+    const afterUpdate = await service.findTodoById(todoId);
     expect(afterUpdate.content).toBe(content);
   });
 
@@ -231,7 +287,7 @@ describe('Delete', () => {
     await service.create(userId, createTodo);
 
     // delete前のデータを確認
-    const beforeDelete = await service.findById(todoId);
+    const beforeDelete = await service.findTodoById(todoId);
     const beforeDeleteAll = await service.findAll(userId);
     expect(beforeDelete).not.toBeNull();
     expect(beforeDeleteAll.TODAY[0].id).toBe(todoId);
@@ -240,7 +296,7 @@ describe('Delete', () => {
     await service.delete(userId, todoId);
 
     // delete後のデータを確認
-    const afterDelete = await service.findById(todoId);
+    const afterDelete = await service.findTodoById(todoId);
     const afterDeleteAll = await service.findAll(userId);
     expect(afterDelete).toBeNull();
     expect(afterDeleteAll.TODAY[0].id).not.toBe(todoId);
