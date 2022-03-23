@@ -87,7 +87,10 @@ export class UserService {
         'Access denied: The userId obtained during authentication and the param userId provided are different values.',
       );
     }
-    const avatarUrl = await this.cloudStorageService.uploadImage(file, userId);
+    const avatarUrl = await this.cloudStorageService.uploadAvatarImage(
+      file,
+      userId,
+    );
     return await this.prisma.user.update({
       where: { id: userId },
       data: { avatarUrl },

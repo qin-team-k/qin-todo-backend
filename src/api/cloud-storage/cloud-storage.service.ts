@@ -43,7 +43,7 @@ export class CloudStorageService {
     }
   }
 
-  async uploadImage(
+  async uploadAvatarImage(
     uploadedFile: Express.Multer.File,
     userId: string,
   ): Promise<string> {
