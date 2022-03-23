@@ -1,3 +1,4 @@
+import { parse } from 'path';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
@@ -80,16 +81,21 @@ export class UserService {
   async uploadAvatarImage(
     userId: string,
     paramUserId: string,
-    file: Express.Multer.File,
+    avatarImage: Express.Multer.File,
   ): Promise<User> {
     if (userId !== paramUserId) {
       throw new ForbiddenException(
         'Access denied: The userId obtained during authentication and the param userId provided are different values.',
       );
     }
-    const avatarUrl = await this.cloudStorageService.uploadAvatarImage(
-      file,
-      userId,
+    // ファイルのアップロード先パス名
+    const fileExtension = parse(avatarImage.originalname).ext;
+    const newFilename = `${userId}/${Date.now()}${fileExtension}`;
+    const filePath = `avatar/${newFilename}`;
+
+    const avatarUrl = await this.cloudStorageService.uploadImage(
+      avatarImage,
+      filePath,
     );
     return await this.prisma.user.update({
       where: { id: userId },

@@ -1,4 +1,3 @@
-import { parse } from 'path';
 import { Bucket, Storage } from '@google-cloud/storage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -18,15 +17,6 @@ export class CloudStorageService {
     this.bucket = this.storage.bucket(process.env.STORAGE_MEDIA_BUCKET);
   }
 
-  private setFilePath(
-    uploadedFile: Express.Multer.File,
-    userId: string,
-  ): string {
-    const fileExtension = parse(uploadedFile.originalname).ext;
-    const newFilename = `${userId}/${Date.now()}${fileExtension}`;
-    return `avatar/${newFilename}`;
-  }
-
   private async saveImageToStorage(
     uploadedFile: Express.Multer.File,
     filePath: string,
@@ -43,11 +33,10 @@ export class CloudStorageService {
     }
   }
 
-  async uploadAvatarImage(
+  async uploadImage(
     uploadedFile: Express.Multer.File,
-    userId: string,
+    filePath: string,
   ): Promise<string> {
-    const filePath = this.setFilePath(uploadedFile, userId);
     await this.saveImageToStorage(uploadedFile, filePath);
     const STORAGE_URL = process.env.STORAGE_URL;
 
