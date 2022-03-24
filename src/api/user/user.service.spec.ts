@@ -13,8 +13,8 @@ beforeAll(async () => {
     providers: [PrismaService, CloudStorageService, UserService],
   }).compile();
 
-  service = module.get(UserService);
-  prisma = module.get(PrismaService);
+  service = module.get<UserService>(UserService);
+  prisma = module.get<PrismaService>(PrismaService);
 });
 
 beforeEach(async () => {
