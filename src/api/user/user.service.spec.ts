@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { TodoStatus } from '@prisma/client';
 import { resetDatabase } from 'src/common/helper/resetDatabase';
 import { PrismaService } from 'src/prisma.service';
 import { CloudStorageService } from '../cloud-storage/cloud-storage.service';
@@ -21,6 +22,10 @@ beforeEach(async () => {
   await resetDatabase();
 });
 
+const updateUserDto = {
+  username: 'Jane Smith',
+};
+
 // テストデータ
 const createUserDto = {
   email: 'jane@example.com',
@@ -30,12 +35,6 @@ const createUserDto = {
   uid: '0e7eaf56-1eed-4dea-b791-2d51efaffc59',
 };
 
-const userId = '24b7282f-9d30-450b-8383-758ec0506b4d';
-const paramUserId = '12345';
-const updateUserDto = {
-  username: 'Jane Smith',
-};
-
 // UserServiceのテスト
 describe('UserService', () => {
   it('can create an instance of user service', async () => {
@@ -43,10 +42,11 @@ describe('UserService', () => {
   });
 });
 
-// initUserメソッドのテスト
-describe('InitUser', () => {
-  it('Normal case: creates a new user with Google auth and get creates todoOrderTable', async () => {
-    const user = await service.initUser(createUserDto);
+// createUserのテスト
+describe('CreateUser', () => {
+  it('Normal case: creates a new user', async () => {
+    const user = await service.createUser(createUserDto);
+
     // initUser後のデータを確認
     expect(user.uid).toEqual(createUserDto.uid);
     expect(user.email).toEqual(createUserDto.email);
@@ -55,11 +55,112 @@ describe('InitUser', () => {
   });
 });
 
+// initUserメソッドのテスト
+describe('InitUser', () => {
+  it('Normal case: creates a new user with Google auth and get creates todoOrderTable', async () => {
+    const user = await service.initUser(createUserDto);
+
+    // initUser後のデータを確認
+    expect(user.uid).toEqual(createUserDto.uid);
+    expect(user.email).toEqual(createUserDto.email);
+    expect(user.username).toEqual(createUserDto.name);
+    expect(user.avatarUrl).toEqual(createUserDto.avatarUrl);
+
+    const todoOrders = await prisma.todoOrder.findMany({
+      where: { userId: user.id },
+    });
+
+    // todoOrderのlengthが3であるか確認
+    expect(todoOrders.length).toEqual(3);
+    todoOrders.forEach((todoOrder) => {
+      expect(todoOrder.todoIds).toBeNull();
+    });
+
+    // todoOrderのuserIdが全て同じか確認
+    const todoOrdersUserIds = todoOrders.map((todoOrder) => {
+      return todoOrder.userId;
+    });
+    expect(todoOrdersUserIds).toEqual([
+      todoOrdersUserIds[0],
+      todoOrdersUserIds[0],
+      todoOrdersUserIds[0],
+    ]);
+
+    // todoOrderのstatusに "TODAY", "TOMORROW", "NEXT" があるか確認
+    const todoOrdersStatus = todoOrders.map((todoOrder) => {
+      return todoOrder.status;
+    });
+    expect(todoOrdersStatus).toEqual([
+      TodoStatus.TODAY,
+      TodoStatus.TOMORROW,
+      TodoStatus.NEXT,
+    ]);
+  });
+
+  // TODO 未実装ためコメントアウト: PrismaClientKnownRequestErrorをinitUserに追加するべき?
+  /**
+   * if(error instanceof PrismaClientKnownRequestError) {
+   *  if(error.code === "P2002") {
+   *    throw new ForbiddenException("User already exists.")
+   *  }
+   * }
+   * throw error
+   */
+  // it('Abnormal case: throws an error if fail to create a new user', async () => {
+  //   // すでに同じemailが存在するテストデータ
+  //   const createInvalidUserDto = {
+  //     email: 'john@example.com',
+  //     name: 'Jane Smith',
+  //     avatarUrl:
+  //       'https://gravatar.com/avatar/ff3bd3d6733b66d9bf8361c8c8b47147?s=400&d=robohash&r=x',
+  //     uid: '0e7eaf56-1eed-4dea-b791-2d51efaffc59',
+  //   };
+  //   try {
+  //     await service.initUser(createUserDto);
+  //   } catch (error) {
+  //     expect(error.status).toBe(403);
+  //   }
+  // });
+});
+
 // updateUserメソッドのテスト
 describe('UpdateUser', () => {
-  it('Normal case: throws an error if userId and paramUserId is not equal when update username', async () => {
+  it('Normal case: Update username', async () => {
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
+    const paramUserId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
+    const userBeforeUpdate = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+    const updatedUser = await service.updateUser(
+      userId,
+      paramUserId,
+      updateUserDto,
+    );
+    expect(userBeforeUpdate.username).not.toEqual(updatedUser.username);
+  });
+
+  it('Abnormal case: throws an error if userId and paramUserId is not equal when update username', async () => {
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
+    const paramUserId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
     await expect(
       service.updateUser(userId, paramUserId, updateUserDto),
     ).rejects.toThrowError(ForbiddenException);
   });
+});
+
+// deleteUserメソッドのテスト
+describe('DeleteUser', () => {
+  it('Normal case: delete user', async () => {
+    const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
+
+    await service.deleteUser(userId);
+    const user = await service.findUserByUserId(userId);
+    expect(user).toBeNull();
+  });
+
+  // TODO 未実装ためコメントアウト: userが存在しない場合のエラー処理を追加するべき?
+  // it('Abnormal case: throws an error if userId and paramUserId is not equal when update username', async () => {
+  //   const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
+  //   expect(await service.deleteUser(userId)).toBeUndefined();
+  // });
 });
