@@ -40,7 +40,7 @@ export class UserService {
     }
   }
 
-  async createTodoOrder(user): Promise<void> {
+  async createTodoOrder(user: User): Promise<void> {
     await this.prisma.todoOrder.createMany({
       data: [
         { userId: user.id, status: TodoStatus.TODAY },
