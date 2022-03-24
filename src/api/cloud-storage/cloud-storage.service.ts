@@ -1,4 +1,3 @@
-import { parse } from 'path';
 import { Bucket, Storage } from '@google-cloud/storage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
@@ -18,21 +17,11 @@ export class CloudStorageService {
     this.bucket = this.storage.bucket(process.env.STORAGE_MEDIA_BUCKET);
   }
 
-  private setFilePath(
+  private async saveImageToStorage(
     uploadedFile: Express.Multer.File,
-    userId: string,
-  ): string {
-    const fileName = parse(uploadedFile.originalname);
-    return `avatar/${userId}/${Date.now()}${fileName.ext}`;
-  }
-
-  async uploadFile(
-    uploadedFile: Express.Multer.File,
-    userId: string,
-  ): Promise<string> {
-    const filePath = this.setFilePath(uploadedFile, userId);
+    filePath: string,
+  ): Promise<void> {
     const file = this.storage.bucket(this.bucket.name).file(filePath);
-
     try {
       await file.save(uploadedFile.buffer, {
         contentType: uploadedFile.mimetype,
@@ -42,6 +31,15 @@ export class CloudStorageService {
     } catch (error) {
       throw new BadRequestException(error?.message);
     }
-    return `https://storage.googleapis.com/${this.bucket.name}/${file.name}`;
+  }
+
+  async uploadImage(
+    uploadedFile: Express.Multer.File,
+    filePath: string,
+  ): Promise<string> {
+    await this.saveImageToStorage(uploadedFile, filePath);
+    const STORAGE_URL = process.env.STORAGE_URL;
+
+    return `${STORAGE_URL}/${this.bucket.name}/${filePath}`;
   }
 }

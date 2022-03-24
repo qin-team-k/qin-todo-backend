@@ -1,8 +1,10 @@
+import { parse } from 'path';
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { TodoStatus, User } from '@prisma/client';
 import { PrismaService } from 'src/prisma.service';
 import { CloudStorageService } from '../cloud-storage/cloud-storage.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -60,29 +62,41 @@ export class UserService {
     });
   }
 
-  async updateUsername(
+  async updateUser(
     userId: string,
     paramUserId: string,
-    username: string,
+    updateUserDto: UpdateUserDto,
   ): Promise<User> {
     if (userId !== paramUserId) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException(
+        'Access denied: The userId obtained during authentication and the param userId provided are different values.',
+      );
     }
     return await this.prisma.user.update({
       where: { id: userId },
-      data: { username },
+      data: { username: updateUserDto.username },
     });
   }
 
-  async updateAvatarUrl(
+  async uploadAvatarImage(
     userId: string,
     paramUserId: string,
-    file: Express.Multer.File,
+    avatarImage: Express.Multer.File,
   ): Promise<User> {
     if (userId !== paramUserId) {
-      throw new ForbiddenException('Access denied');
+      throw new ForbiddenException(
+        'Access denied: The userId obtained during authentication and the param userId provided are different values.',
+      );
     }
-    const avatarUrl = await this.cloudStorageService.uploadFile(file, userId);
+    // ファイルのアップロード先パス名
+    const fileExtension = parse(avatarImage.originalname).ext;
+    const newFilename = `${userId}/${Date.now()}${fileExtension}`;
+    const filePath = `avatar/${newFilename}`;
+
+    const avatarUrl = await this.cloudStorageService.uploadImage(
+      avatarImage,
+      filePath,
+    );
     return await this.prisma.user.update({
       where: { id: userId },
       data: { avatarUrl },
