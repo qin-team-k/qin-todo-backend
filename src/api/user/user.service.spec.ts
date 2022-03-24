@@ -4,6 +4,7 @@ import { TodoStatus } from '@prisma/client';
 import { resetDatabase } from 'src/common/helper/resetDatabase';
 import { PrismaService } from 'src/prisma.service';
 import { CloudStorageService } from '../cloud-storage/cloud-storage.service';
+import { CreateUserDto } from './dto/create-user.dto';
 import { UserService } from './user.service';
 
 let service: UserService;
@@ -27,9 +28,9 @@ const updateUserDto = {
 };
 
 // テストデータ
-const createUserDto = {
-  email: 'jane@example.com',
-  name: 'Jane Smith',
+const createUserDto: CreateUserDto = {
+  email: 'John@skynet.com',
+  name: 'John Conner',
   avatarUrl:
     'https://gravatar.com/avatar/ff3bd3d6733b66d9bf8361c8c8b47147?s=400&d=robohash&r=x',
   uid: '0e7eaf56-1eed-4dea-b791-2d51efaffc59',
@@ -43,16 +44,125 @@ describe('UserService', () => {
 });
 
 // createUserのテスト
+// TODO initUserのテスト内容と重複するのはどうするか?
 describe('CreateUser', () => {
   it('Normal case: creates a new user', async () => {
     const user = await service.createUser(createUserDto);
 
-    // initUser後のデータを確認
+    // createUser後のデータを確認
     expect(user.uid).toEqual(createUserDto.uid);
     expect(user.email).toEqual(createUserDto.email);
     expect(user.username).toEqual(createUserDto.name);
     expect(user.avatarUrl).toEqual(createUserDto.avatarUrl);
   });
+  /**
+   *
+   *
+   * createUserのAbNormal
+   *
+   *
+   *
+   *
+   *
+   *
+   */
+});
+
+// findUserByUidのテスト
+// describe('FindUserByUid', () => {
+//   it('Normal case: creates a new user', async () => {
+//     const user = await service.createUser(createUserDto);
+
+//     // createUser後のデータを確認
+//     expect(user.uid).toEqual(createUserDto.uid);
+//     expect(user.email).toEqual(createUserDto.email);
+//     expect(user.username).toEqual(createUserDto.name);
+//     expect(user.avatarUrl).toEqual(createUserDto.avatarUrl);
+//   });
+/**
+ *
+ *
+ * createUserのAbNormal
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+// });
+
+// findUserByUserIdのテスト
+// describe('FindUserByUid', () => {
+//   it('Normal case: creates a new user', async () => {
+//     const user = await service.createUser(createUserDto);
+
+//     // createUser後のデータを確認
+//     expect(user.uid).toEqual(createUserDto.uid);
+//     expect(user.email).toEqual(createUserDto.email);
+//     expect(user.username).toEqual(createUserDto.name);
+//     expect(user.avatarUrl).toEqual(createUserDto.avatarUrl);
+//   });
+/**
+ *
+ *
+ * createUserのAbNormal
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+// });
+
+// createTodoOrderのテスト
+// TODO initUserのテスト内容と重複するのはどうするか?
+describe('createTodoOrder', () => {
+  it('Normal case: creates todoOrder', async () => {
+    const user = await service.createUser(createUserDto);
+    await service.createTodoOrder(user);
+    const todoOrders = await prisma.todoOrder.findMany({
+      where: { userId: user.id },
+    });
+
+    // todoOrderのlengthが3であるか確認
+    expect(todoOrders.length).toEqual(3);
+    todoOrders.forEach((todoOrder) => {
+      expect(todoOrder.todoIds).toBeNull();
+    });
+
+    // todoOrderのuserIdが全て同じか確認
+    const todoOrdersUserIds = todoOrders.map((todoOrder) => {
+      return todoOrder.userId;
+    });
+    expect(todoOrdersUserIds).toEqual([
+      todoOrdersUserIds[0],
+      todoOrdersUserIds[0],
+      todoOrdersUserIds[0],
+    ]);
+
+    // todoOrderのstatusに "TODAY", "TOMORROW", "NEXT" があるか確認
+    const todoOrdersStatus = todoOrders.map((todoOrder) => {
+      return todoOrder.status;
+    });
+    expect(todoOrdersStatus).toEqual([
+      TodoStatus.TODAY,
+      TodoStatus.TOMORROW,
+      TodoStatus.NEXT,
+    ]);
+  });
+  /**
+   *
+   *
+   * createTodoOrderのAbNormal
+   *
+   *
+   *
+   *
+   *
+   *
+   */
 });
 
 // initUserメソッドのテスト
