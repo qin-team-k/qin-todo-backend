@@ -30,6 +30,16 @@ export class UserService {
     });
   }
 
+  async findUserByUserId(userId: string): Promise<User> {
+    try {
+      return await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async createTodoOrder(user): Promise<void> {
     await this.prisma.todoOrder.createMany({
       data: [
