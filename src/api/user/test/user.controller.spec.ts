@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { User } from '@prisma/client';
 import { UserService } from 'src/api/user/user.service';
 import { AuthenticateGuard } from 'src/common/guards/authenticate/authenticate.guard';
 import { PrismaService } from 'src/prisma.service';
@@ -47,14 +46,9 @@ describe('UserController', () => {
   // usersのテスト
   describe('users', () => {
     describe('when users is called', () => {
-      let user: User;
-
-      beforeEach(async () => {
-        user = await controller.users(userStub());
-      });
-
       // 戻り値がuserであるか確認
-      it('then it should return a user', () => {
+      it('then it should return a user', async () => {
+        const user = await controller.users(userStub());
         expect(user).toEqual(userStub());
       });
     });
@@ -63,22 +57,13 @@ describe('UserController', () => {
   // updateUserのテスト
   describe('updateUser', () => {
     describe('then it when updateUser is called', () => {
-      let user: User;
-      let updateUserDto: UpdateUserDto;
-
-      beforeEach(async () => {
-        updateUserDto = {
-          username: 'Jane Smith',
-        };
-      });
+      const updateUserDto: UpdateUserDto = {
+        username: 'updated username',
+      };
 
       // controllerで呼び出しているuserServiceのupdateUserが引数(userId, paramUserId, createUserDto)で呼ばれたか確認
       it('should call userService', async () => {
-        user = await controller.updateUser(
-          userStub(),
-          userStub().id,
-          updateUserDto,
-        );
+        await controller.updateUser(userStub(), userStub().id, updateUserDto);
         expect(await service.updateUser).toBeCalledWith(
           userStub().id,
           userStub().id,
@@ -88,12 +73,15 @@ describe('UserController', () => {
 
       // 戻り値がuserであるか確認
       it('then it should return a user', async () => {
-        user = await controller.updateUser(
+        const user = await controller.updateUser(
           userStub(),
           userStub().id,
           updateUserDto,
         );
-        expect(user).toEqual(userStub());
+
+        const result = userStub();
+        result.username = updateUserDto.username;
+        expect(user).toEqual(result);
       });
     });
   });
@@ -101,13 +89,13 @@ describe('UserController', () => {
   // updateAvatarのテスト
   describe('updateAvatar', () => {
     describe('when updateAvatar is called', () => {
-      let user: User;
-      let avatarImage: Express.Multer.File;
-      let multer;
+      let multerAvatarImage;
+      const avatarUrl =
+        'https://gravatar.com/avatar/updated3cb5628734a944573d67a587asdfasdfafb?s=400&d=robohash&r=x';
 
       // アップデートファイルのmockを作成
       jest.mock('multer', () => {
-        multer = () => ({
+        multerAvatarImage = () => ({
           any: () => {
             return (req, _res, next) => {
               req.body = { userName: 'testUser' };
@@ -123,31 +111,35 @@ describe('UserController', () => {
             };
           },
         });
-        multer.memoryStorage = () => jest.fn();
-        return multer;
-      });
-
-      beforeEach(async () => {
-        avatarImage = multer;
-        user = await controller.updateAvatar(
-          userStub(),
-          userStub().id,
-          avatarImage,
-        );
+        multerAvatarImage.memoryStorage = () => jest.fn();
+        return multerAvatarImage;
       });
 
       // controllerで呼び出しているuserServiceのuploadAvatarImageが引数(userId, paramUserId, createUserDto)で呼ばれたか確認
-      it('then it should call userService', () => {
+      it('then it should call userService', async () => {
+        await controller.updateAvatar(
+          userStub(),
+          userStub().id,
+          multerAvatarImage,
+        );
         expect(service.uploadAvatarImage).toBeCalledWith(
           userStub().id,
           userStub().id,
-          avatarImage,
+          multerAvatarImage,
         );
       });
 
       // 戻り値がuserであるか確認
-      it('then it should return a user', () => {
-        expect(user).toEqual(userStub());
+      it('then it should return a user', async () => {
+        const user = await controller.updateAvatar(
+          userStub(),
+          userStub().id,
+          multerAvatarImage,
+        );
+
+        const result = userStub();
+        result.avatarUrl = avatarUrl;
+        expect(user).toEqual(result);
       });
     });
   });
@@ -155,17 +147,15 @@ describe('UserController', () => {
   // deleteのテスト
   describe('delete', () => {
     describe('when delete is called', () => {
-      beforeEach(async () => {
-        await controller.delete(userStub());
-      });
-
       // 戻り値がundefinedであるか確認
       it('then it should be undefined', async () => {
+        await controller.delete(userStub());
         expect(await service.deleteUser(userStub().id)).toBeUndefined();
       });
 
       // controllerで呼び出しているuserServiceのupdateUserが引数(userId)で呼ばれたか確認
-      it('then it should call userService', () => {
+      it('then it should call userService', async () => {
+        await controller.delete(userStub());
         expect(service.deleteUser).toBeCalledWith(userStub().id);
       });
     });
