@@ -1,7 +1,10 @@
-import { userStub } from '../test/stubs/user.stub';
+import {
+  updatedUserStub,
+  updatedAvatarImageStub,
+} from '../test/stubs/user.stub';
 
 export const UserService = jest.fn().mockReturnValue({
-  updateUser: jest.fn().mockResolvedValue(userStub()),
-  uploadAvatarImage: jest.fn().mockResolvedValue(userStub()),
+  updateUser: jest.fn().mockResolvedValue(updatedUserStub()),
+  uploadAvatarImage: jest.fn().mockResolvedValue(updatedAvatarImageStub()),
   deleteUser: jest.fn().mockResolvedValue(undefined),
 });
