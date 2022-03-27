@@ -13,25 +13,31 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "node dist/main",
+    "start:prod": "node dist/src/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "docker:up": "docker-compose -f ./docker/docker-compose.yml -p qin-todo up -d",
-    "migrate": "prisma db push --preview-feature",
     "docker:down": "docker-compose -f ./docker/docker-compose.yml -p qin-todo down",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:cov": "jest --coverage",
+    "docker:reset": "yarn docker:down && yarn docker:up",
+    "migrate": "yarn prisma db push && npx ts-node prisma/seed/start.ts",
+    "test": "yarn migrate && jest --runInBand",
+    "test:watch": "jest --watch --runInBand",
+    "test:cov": "jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "yarn migrate && jest --config ./test/jest-e2e.json"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed/start.ts"
   },
   "dependencies": {
+    "@google-cloud/storage": "^5.18.2",
     "@nestjs/common": "^8.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
-    "@nestjs/platform-fastify": "^8.2.6",
     "@prisma/client": "^3.9.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
+    "firebase-admin": "^10.0.2",
+    "path": "^0.12.7",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0"
@@ -42,13 +48,17 @@
     "@nestjs/testing": "^8.0.0",
     "@types/express": "^4.17.13",
     "@types/jest": "27.0.2",
+    "@types/multer": "^1.4.7",
     "@types/node": "^16.0.0",
     "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
+    "eslint-import-resolver-typescript": "^2.5.0",
+    "eslint-plugin-import": "^2.25.4",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
     "jest": "^27.2.5",
     "prettier": "^2.3.2",
     "prisma": "^3.9.2",
@@ -66,7 +76,9 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "moduleNameMapper": {
+      "src(.*)$": "<rootDir>/src/$1"
+    },
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
