@@ -1,2 +1,2 @@
-yarn run prisma migrate deploy
+yarn run prisma db push
 yarn start:prod
