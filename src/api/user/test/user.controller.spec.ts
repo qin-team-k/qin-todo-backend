@@ -70,16 +70,16 @@ describe('UserController', () => {
         updateUserDto = {
           username: 'Jane Smith',
         };
+      });
+
+      // controllerで呼び出しているuserServiceのupdateUserが引数(userId, paramUserId, createUserDto)で呼ばれたか確認
+      it('should call userService', async () => {
         user = await controller.updateUser(
           userStub(),
           userStub().id,
           updateUserDto,
         );
-      });
-
-      // controllerで呼び出しているuserServiceのupdateUserが引数(userId, paramUserId, createUserDto)で呼ばれたか確認
-      it('should call userService', () => {
-        expect(service.updateUser).toBeCalledWith(
+        expect(await service.updateUser).toBeCalledWith(
           userStub().id,
           userStub().id,
           updateUserDto,
@@ -87,7 +87,12 @@ describe('UserController', () => {
       });
 
       // 戻り値がuserであるか確認
-      it('then it should return a user', () => {
+      it('then it should return a user', async () => {
+        user = await controller.updateUser(
+          userStub(),
+          userStub().id,
+          updateUserDto,
+        );
         expect(user).toEqual(userStub());
       });
     });
@@ -151,12 +156,12 @@ describe('UserController', () => {
   describe('delete', () => {
     describe('when delete is called', () => {
       beforeEach(async () => {
-        await service.deleteUser(userStub().id);
+        await controller.delete(userStub());
       });
 
       // 戻り値がundefinedであるか確認
       it('then it should be undefined', async () => {
-        expect(await controller.delete(userStub())).toBeUndefined();
+        expect(await service.deleteUser(userStub().id)).toBeUndefined();
       });
 
       // controllerで呼び出しているuserServiceのupdateUserが引数(userId)で呼ばれたか確認
