@@ -102,7 +102,7 @@ describe('UserController', () => {
               req.files = [
                 {
                   originalname: 'sample.name',
-                  mimetype: 'sample.type',
+                  mimetype: 'image/png',
                   path: 'sample.url',
                   buffer: Buffer.from('whatever'),
                 },
