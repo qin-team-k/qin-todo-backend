@@ -1,4 +1,3 @@
-import { writeFileSync } from 'fs';
 import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TodoStatus } from '@prisma/client';
@@ -13,6 +12,7 @@ import { UserService } from '../user.service';
 describe('UserService', () => {
   let service: UserService;
   let prisma: PrismaService;
+  let cloudStorage: CloudStorageService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -21,6 +21,7 @@ describe('UserService', () => {
 
     service = module.get<UserService>(UserService);
     prisma = module.get<PrismaService>(PrismaService);
+    cloudStorage = module.get<CloudStorageService>(CloudStorageService);
   });
 
   beforeEach(async () => {
@@ -88,7 +89,7 @@ describe('UserService', () => {
     const updateUserDto: UpdateUserDto = {
       username: 'Jane Smith',
     };
-
+    // アップデート前後のusernameが一緒ではないことを確認
     it('Normal case: Update username', async () => {
       const userId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
       const paramUserId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
@@ -104,6 +105,7 @@ describe('UserService', () => {
       expect(userBeforeUpdate.username).not.toEqual(updatedUser.username);
     });
 
+    // 引数のuserIdとparamUserIdが一緒でない場合エラーになることを確認
     it('Abnormal case: throws an error if userId and paramUserId is not equal when update username', async () => {
       const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
       const paramUserId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
@@ -115,10 +117,11 @@ describe('UserService', () => {
 
   // uploadAvatarImageメソッドのテスト
   describe('uploadAvatarImage', () => {
-    it('Normal case: upload avatar image', async () => {
-      const userId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
-      const paramUserId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
+    let multerAvatarImage;
+    let avatarUrl: string;
 
+    beforeEach(async () => {
+      // multerFileを作成
       const img =
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0' +
         'NAAAAKElEQVQ4jWNgYGD4Twzu6FhFFGYYNXDUwGFpIAk2E4dHDRw1cDgaCAASFOffhEIO' +
@@ -126,23 +129,55 @@ describe('UserService', () => {
       // プレフィックスを除去しbase64にエンコードされたbytes
       const data = img.replace(/^data:image\/\w+;base64,/, '');
       const buffer = Buffer.from(data, 'base64');
-      await writeFileSync(`${__dirname}/image.png`, buffer);
+      multerAvatarImage = {
+        fieldname: 'file',
+        originalname: 'image.png',
+        encoding: '7bit',
+        mimetype: 'image/png',
+        buffer,
+        size: 776,
+      };
+    });
+
+    afterEach(async () => {
+      // cloud storageにアップロードされたファイルを削除
+      const filePath = avatarUrl.split(
+        'https://storage.googleapis.com/qin-todo-backend-dev/',
+      )[1];
+      await cloudStorage.deleteImage(filePath);
+    });
+
+    // アップロード前後のavatarUrlが一緒ではないことを確認
+    it('Normal case: upload avatar image', async () => {
+      const userId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
+      const paramUserId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
 
       const userBeforeUpdate = await prisma.user.findUnique({
         where: { id: userId },
       });
 
-      // const updatedUser = await service.uploadAvatarImage(
-      //   userId,
-      //   paramUserId,
-      //   multerAvatarImage,
-      // );
-      // expect(userBeforeUpdate.avatarUrl).not.toEqual(updatedUser.avatarUrl);
+      const updatedUser = await service.uploadAvatarImage(
+        userId,
+        paramUserId,
+        multerAvatarImage,
+      );
+      avatarUrl = updatedUser.avatarUrl;
+      expect(userBeforeUpdate.avatarUrl).not.toEqual(updatedUser.avatarUrl);
+    });
+
+    // 引数のuserIdとparamUserIdが一緒でない場合エラーになることを確認
+    it('Abnormal case: throws an error if userId and paramUserId is not equal when update username', async () => {
+      const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
+      const paramUserId = '62ac362a-cd60-45b1-9100-3b469eceb31d';
+      await expect(
+        service.updateUser(userId, paramUserId, multerAvatarImage),
+      ).rejects.toThrowError(ForbiddenException);
     });
   });
 
   // deleteUserメソッドのテスト
   describe('deleteUser', () => {
+    // 削除後のユーザーが存在しないことを確認
     it('Normal case: delete user', async () => {
       const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
 
