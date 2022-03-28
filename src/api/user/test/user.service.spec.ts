@@ -3,10 +3,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TodoStatus } from '@prisma/client';
 import { resetDatabase } from 'src/common/helper/resetDatabase';
 import { PrismaService } from 'src/prisma.service';
-import { CloudStorageService } from '../cloud-storage/cloud-storage.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UserService } from './user.service';
+import { CloudStorageService } from '../../cloud-storage/cloud-storage.service';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UpdateUserDto } from '../dto/update-user.dto';
+import { UserService } from '../user.service';
 
 // UserServiceのテスト
 describe('UserService', () => {
