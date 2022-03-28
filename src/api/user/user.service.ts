@@ -83,16 +83,8 @@ export class UserService {
   }
 
   async deleteUser(userId: string): Promise<void> {
-    await this.prisma.$transaction(async (prisma) => {
-      await prisma.todoOrder.deleteMany({
-        where: { userId },
-      });
-      await prisma.todo.deleteMany({
-        where: { userId },
-      });
-      await prisma.user.delete({
-        where: { id: userId },
-      });
+    await this.prisma.user.delete({
+      where: { id: userId },
     });
   }
 }
