@@ -28,7 +28,6 @@ export class UserController {
    * GET /api/v1/users
    * ユーザー情報を返す
    */
-
   @Version('1')
   @Get()
   async users(@GetCurrentUser() user: User): Promise<User> {
@@ -39,7 +38,6 @@ export class UserController {
    * PUT /api/v1/users/:userId
    * ユーザー名を更新する
    */
-
   @Version('1')
   @Put(':userId')
   async updateUser(
@@ -54,7 +52,6 @@ export class UserController {
    * PUT /api/v1/users/:userId/avatar
    * アバター画像を更新する
    */
-
   @Version('1')
   @Put(':userId/avatar')
   @UseInterceptors(FileInterceptor('file', multerOptions))
