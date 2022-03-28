@@ -177,7 +177,7 @@ describe('UserService', () => {
 
   // deleteUserメソッドのテスト
   describe('deleteUser', () => {
-    // 削除後のユーザーが存在しないことを確認
+    // 削除したユーザーが存在しないことを確認
     it('Normal case: delete user', async () => {
       const userId = '4ff64eb1-c22a-4455-a50d-75cdc3c1e561';
 
