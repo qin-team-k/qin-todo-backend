@@ -26,8 +26,6 @@ export class CloudStorageService {
       await file.save(uploadedFile.buffer, {
         contentType: uploadedFile.mimetype,
       });
-      // 公開ファイルにする
-      await file.makePublic();
     } catch (error) {
       throw new BadRequestException(error?.message);
     }
