@@ -13,30 +13,9 @@ export class UserService {
     private readonly cloudStorageService: CloudStorageService,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
-    return await this.prisma.user.create({
-      data: {
-        uid: createUserDto.uid,
-        username: createUserDto.name,
-        email: createUserDto.email,
-        avatarUrl: createUserDto.avatarUrl,
-      },
-    });
-  }
-
   async findUserByUid(uid: string): Promise<User> {
     return await this.prisma.user.findUnique({
       where: { uid },
-    });
-  }
-
-  async createTodoOrder(user): Promise<void> {
-    await this.prisma.todoOrder.createMany({
-      data: [
-        { userId: user.id, status: TodoStatus.TODAY },
-        { userId: user.id, status: TodoStatus.TOMORROW },
-        { userId: user.id, status: TodoStatus.NEXT },
-      ],
     });
   }
 
