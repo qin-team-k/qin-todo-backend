@@ -1,4 +1,4 @@
-import { Bucket, Storage } from '@google-cloud/storage';
+import { Bucket, DeleteFileOptions, Storage } from '@google-cloud/storage';
 import { BadRequestException, Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -26,8 +26,6 @@ export class CloudStorageService {
       await file.save(uploadedFile.buffer, {
         contentType: uploadedFile.mimetype,
       });
-      // 公開ファイルにする
-      await file.makePublic();
     } catch (error) {
       throw new BadRequestException(error?.message);
     }
@@ -41,5 +39,20 @@ export class CloudStorageService {
     const STORAGE_URL = process.env.STORAGE_URL;
 
     return `${STORAGE_URL}/${this.bucket.name}/${filePath}`;
+  }
+
+  async deleteImage(filePath: string): Promise<void> {
+    const options: DeleteFileOptions = {
+      // オブジェクトが存在しない場合エラーにするかどうか
+      ignoreNotFound: true,
+    };
+    try {
+      await this.storage
+        .bucket(this.bucket.name)
+        .file(filePath)
+        .delete(options);
+    } catch (error) {
+      throw new BadRequestException(error?.message);
+    }
   }
 }
